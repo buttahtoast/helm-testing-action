@@ -1,0 +1,46 @@
+name: 'Helm Chart Publish'
+description: 'Bash Wrapper for Chart Releaser with improved functionality'
+branding:
+  icon: 'archive'
+  color: 'blue'
+inputs:
+  token:
+    description: 'A personal access token needed to push your site after it has been built.'
+    required: true
+  config:
+    description: 'Chart Releaser configuration file'
+    required: false
+    default: './cr.yaml'
+
+
+  user:
+    description: 'Define the user name used for commits (pages update)'
+    default: "$GITHUB_ACTOR"
+    required: false
+
+  email:
+    description: 'Define the user email used for commits (pages update)'
+    default: "$GITHUB_ACTOR@users.noreply.github.com"
+    required: false
+
+  ## Configuration for git-repo name
+  ## Reference: https://github.com/helm/chart-releaser#environment-variables
+  ##
+  git-repo:
+    description: 'Define which repository will be used for the package upload (default helm-charts).'
+    required: false
+
+  repository:
+    description: 'Define the repository url, where the index is exposed. By default we assume you are using {org/user}.github.io/helm-charts/'
+    default: "'$(https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/helm-charts/)'"
+    required: false
+
+
+  chart-directories:
+    description: 'Define folder(s) in which the helm charts are located (comma seperated)'
+    default: 'charts/'
+    required: false
+
+runs:
+  using: docker
+  image: Dockerfile
