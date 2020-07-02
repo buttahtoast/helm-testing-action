@@ -66,6 +66,8 @@ GIT_EMAIL="${GIT_EMAIL:?Missing required Variable}";
 ##
 CR_RELEASE_LOCATION=".cr-release-packages"
 
+printenv
+
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
 ##
