@@ -10,9 +10,11 @@ latestTag() {
 
 ## Define a personal token which
 ## can create new releases and commits
-## to the repository.
+## to the repository. The default configuration
+## environment variable 'CR_TOKEN' is prefered over
+## the input setting.
 ##
-CR_TOKEN="${INPUT_TOKEN:?Missing required Variable}";
+CR_TOKEN="${CR_TOKEN:-$INPUT_TOKEN}";
 
 ## Chart Releaser default repository URL.
 ## This URL is used to fetch the current
@@ -22,11 +24,14 @@ CR_TOKEN="${INPUT_TOKEN:?Missing required Variable}";
 CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/helm-charts/}";
 CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 
-
 ## Repository name under which the
-## releases are created.
+## releases are created. The default configuration
+## environment variable 'CR_GIT_REPO' is prefered over
+## the input setting. If none of both is set, the script
+## will exit.
 ##
-CR_REPO_NAME="$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)";
+CR_GIT_REPO="${CR_GIT_REPO:-$INPUT_GIT-REPO}";
+CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)}";
 
 ## Configuration Option for chart directories
 ## defaults to "charts/" if the input variable
@@ -44,8 +49,8 @@ CR_CONFIG_LOCATION="${INPUT_CONFIG:-$HOME/.cr.yaml}"
 ## Configuration Option for the name for the user used for
 ## git actions. The variable can't be empty.
 ##
-GIT_USERNAME="${INPUT_USER:-$GITHUB_ACTOR}"
-GIT_USERNAME="${GIT_USERNAME:?Missing required Variable}";
+CR_OWNER="${INPUT_USER:-$GITHUB_ACTOR}"
+CR_OWNER="${CR_OWNER:?Missing required Variable}";
 
 ## Configuration Option for the email for the user used for
 ## git actions. The variable can't be empty.
@@ -133,16 +138,16 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ## create a helm release on the GitHub Repository
       ##
       echo -e "\n\e[33m- Creating Releases\e[0m\n"
-      cr upload -o "$GIT_USERNAME" -r "$CR_REPO_NAME" $CR_ARGS
+      cr upload $CR_ARGS
 
       ## Setup git with the given Credentials
       ##
-      git config user.name "$GIT_USERNAME"
+      git config user.name "$CR_OWNER"
       git config user.email "$GIT_EMAIL"
 
       ## Recreate Index for the Pages index
       ##
-      cr index -o "$GIT_USERNAME" -r "$CR_REPO_NAME" -c "$CR_REPO_URL" $CR_ARGS
+      cr index -c "$CR_REPO_URL" $CR_ARGS
 
       ## Checkout the pages branch and
       ## add Index as new addition and make a signed
