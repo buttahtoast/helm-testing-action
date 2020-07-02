@@ -6,7 +6,6 @@ latestTag() {
 }
 
 printenv
-
 ## Environment Variables
 ## CR Configuration Variables (Required)
 
@@ -59,6 +58,7 @@ CR_OWNER="${CR_OWNER:?Missing required Variable}";
 ##
 GIT_EMAIL="${INPUT_EMAIL:-$GITHUB_ACTOR@users.noreply.github.com}"
 GIT_EMAIL="${GIT_EMAIL:?Missing required Variable}";
+
 
 ## Not so relevant variables for
 ## the GitHub action

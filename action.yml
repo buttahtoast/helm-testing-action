@@ -12,7 +12,6 @@ inputs:
     required: false
     default: './cr.yaml'
 
-
   user:
     description: 'Define the user name used for commits (pages update)'
     required: false
