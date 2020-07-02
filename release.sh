@@ -5,7 +5,6 @@ latestTag() {
     if ! git describe --tags --abbrev=0 2> /dev/null; then git rev-list --max-parents=0 --first-parent HEAD; fi
 }
 
-printenv
 ## Environment Variables
 ## CR Configuration Variables (Required)
 
@@ -65,6 +64,7 @@ GIT_EMAIL="${GIT_EMAIL:?Missing required Variable}";
 ##
 CR_RELEASE_LOCATION=".cr-release-packages"
 
+printenv
 
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
@@ -72,7 +72,7 @@ CR_RELEASE_LOCATION=".cr-release-packages"
 git fetch --tags
 HEAD_REV=$(git rev-parse --verify HEAD);
 LATEST_TAG_REV=$(git rev-parse --verify "$(latestTag)");
-if [[ "$LATEST_TAG_REV" == "$HEAD_REV" ]]; then echo "Nothing to do!" && exit 0; fi
+if [[ "$LATEST_TAG_REV" == "$HEAD_REV" ]]; then echo -e "\n\e[33mNothing to do!\e[0m\n"; exit 0; fi
 
 ## Evaluate Chart directories
 ## Checks if the variable is split with ,
@@ -151,11 +151,16 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ##
       cr index -c "$CR_REPO_URL" $CR_ARGS
 
+      ## Evaluates if gh-pages branch already exists
+      ## if not the branch newly initialized
+      ##
+      [ `git branch --list $branch_name` ] && GIT_OPTS=" -b "
+
       ## Checkout the pages branch and
       ## add Index as new addition and make a signed
       ## commit to the origin
       ##
-      git checkout -f gh-pages
+      git checkout -f $GIT_OPTS gh-pages
       cp -f .cr-index/index.yaml index.yaml || true
       git add index.yaml
       git status
