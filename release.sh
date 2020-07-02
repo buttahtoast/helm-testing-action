@@ -140,7 +140,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ## create a helm release on the GitHub Repository
       ##
       echo -e "\n\e[33m- Creating Releases\e[0m\n"
-      cr upload $CR_ARGS
+      if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
       ## Setup git with the given Credentials
       ##
@@ -149,12 +149,12 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
 
       ## Recreate Index for the Pages index
       ##
-      cr index -c "$CR_REPO_URL" $CR_ARGS
+      if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
       ## Evaluates if gh-pages branch already exists
       ## if not the branch newly initialized
       ##
-      [ `git branch --list $branch_name` ] && GIT_OPTS=" -b "
+      ! [ `git branch --list $branch_name` ] && GIT_OPTS=" -b "
 
       ## Checkout the pages branch and
       ## add Index as new addition and make a signed

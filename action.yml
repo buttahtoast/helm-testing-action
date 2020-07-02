@@ -1,21 +1,33 @@
 name: 'Helm Chart Publish'
 description: 'Bash Wrapper for Chart Releaser with improved functionality'
+author: 'oliverbaehler'
 branding:
   icon: 'archive'
-  color: 'blue'
+  color: 'purple'
 inputs:
+
+  ## Configuration for the personal acces token being used
+  ##
   token:
     description: 'A personal access token needed to push your site after it has been built.'
     required: true
+
+  ## Configuration fo a Chart Releaser COnfiguration
+  ## Reference:
+  ##
   config:
     description: 'Chart Releaser configuration file'
     required: false
     default: './cr.yaml'
 
+  ## Configuration for the git username (Release owner)
+  ##
   user:
     description: 'Define the user name used for commits (pages update)'
     required: false
 
+  ## Configuration for the git email
+  ##
   email:
     description: 'Define the user email used for commits (pages update)'
     required: false
