@@ -20,12 +20,7 @@ inputs:
   repository:
     description: 'Define the repository url, where the index is exposed. By default we assume you are using {org/user}.github.io/helm-charts/'
     required: false
-
-  troll-me-lol:
-    description: 'Define the repository url, where the index is exposed. By default we assume you are using {org/user}.github.io/helm-charts/'
-    required: false
-
-  chartDirectories:
+  chart-directories:
     description: 'Define folder(s) in which the helm charts are located (comma seperated)'
     required: false
     default: 'charts/'

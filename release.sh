@@ -5,9 +5,6 @@ latestTag() {
     if ! git describe --tags --abbrev=0 2> /dev/null; then git rev-list --max-parents=0 --first-parent HEAD; fi
 }
 
-printenv
-
-
 ## Environment Variables
 ## CR Configuration Variables (Required)
 
@@ -86,13 +83,13 @@ fi
 ## if any Chart.yaml was changed. If so the path to
 ## the chart is added to an array
 ##
-local CHANGED_CHARTS=""
+CHANGED_CHARTS=""
 for i in "${ROOT_DIRS[@]}"
 do
   ## Initialize for each directory a matching regex
   ## which finds changes in the diff statement
   ##
-  local CHART_INDICATOR="$( echo ${i%/} | tr -d '[:space:]' )/*/Chart.yaml"
+  CHART_INDICATOR="$( echo ${i%/} | tr -d '[:space:]' )/*/Chart.yaml"
   CHANGED_CHARTS="${CHANGED_CHARTS} $(git diff --find-renames --name-only $LATEST_TAG_REV -- $CHART_INDICATOR | cut -d '/' -f 1-2 | uniq)"
 done
 
@@ -114,7 +111,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
   ##
   EXISTING_CHARTS=()
   for preChart in "${PUBLISH_CHARTS[@]}"; do
-      local trimChart="$(echo $preChart | xargs)"
+      trimChart="$(echo $preChart | xargs)"
       [ -d "$trimChart" ] && EXISTING_CHARTS+=($trimChart)
   done
 
