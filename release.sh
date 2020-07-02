@@ -13,11 +13,6 @@ createDirs() {
   rm -rf .cr-index && mkdir -p .cr-index ## Recreates Index File
 }
 
-printenv
-echo $GITHUB_REPOSITORY
-
-
-
 ## Environment Variables
 ## CR Configuration Variables (Required)
 
@@ -128,10 +123,18 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
   ## (if that's ever gonna happen).
   ##
   EXISTING_CHARTS=()
-  for preChart in "${PUBLISH_CHARTS[@]}"; do
-      trimChart="$(echo $preChart | xargs)"
-      [ -d "$trimChart" ] && EXISTING_CHARTS+=($trimChart)
+  for PRE_CHART in "${PUBLISH_CHARTS[@]}"; do
+      TRIM_CHART="$(echo $PRE_CHART | xargs)"
+      [ -d "$TRIM_CHART" ] && EXISTING_CHARTS+=($TRIM_CHART)
   done
+
+  ## Evaluates if gh-pages branch already exists
+  ## Branch won't be initialized and therefor throws
+  ## an error on runtime.
+  ##
+  if ! [ `git branch --list 'gh-pages'` ]; then
+      echo -e "\n\e[91mMissing gh-pages branch, please initialize the branch.\e[0m\n"; exit 1;
+  fi
 
   ## Just to be sure, checking that the array
   ## is not empty
@@ -146,9 +149,9 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ## with the helm built-in function.
       ##
       echo -e "\n\e[33m- Crafting Packages\e[0m"
-      for chart in "${EXISTING_CHARTS[@]}"; do
+      for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "\n\e[32m-- Package: $chart\e[0m"
-          helm package $chart --dependency-update --destination ${CR_RELEASE_LOCATION}
+          helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
       done
 
       ## For each package made by helm cr will
@@ -166,16 +169,11 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ##
       if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
-      ## Evaluates if gh-pages branch already exists
-      ## if not the branch newly initialized
-      ##
-      ! [ `git branch --list $branch_name` ] && GIT_OPTS=" -b "
-
       ## Checkout the pages branch and
       ## add Index as new addition and make a signed
       ## commit to the origin
       ##
-      git checkout -f $GIT_OPTS gh-pages
+      git checkout -f gh-pages
       cp -f .cr-index/index.yaml index.yaml || true
       git add index.yaml
       git status
