@@ -24,6 +24,8 @@ CR_TOKEN="${CR_TOKEN:-$INPUT_TOKEN}";
 CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/helm-charts/}";
 CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 
+echo $CR_REPO_URL
+
 ## Repository name under which the
 ## releases are created. The default configuration
 ## environment variable 'CR_GIT_REPO' is prefered over
@@ -63,8 +65,6 @@ GIT_EMAIL="${GIT_EMAIL:?Missing required Variable}";
 ## the GitHub action
 ##
 CR_RELEASE_LOCATION=".cr-release-packages"
-
-printenv
 
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
