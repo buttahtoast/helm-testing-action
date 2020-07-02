@@ -62,8 +62,8 @@ CR_CONFIG_LOCATION="${INPUT_CONFIG:-$HOME/.cr.yaml}"
 ## Configuration Option for the name for the user used for
 ## git actions. The variable can't be empty.
 ##
-export CR_OWNER="${INPUT_USER:-$GITHUB_ACTOR}"
-export CR_OWNER="${CR_OWNER:?Missing required Variable}";
+GIT_USER="${INPUT_USER:-$GITHUB_ACTOR}"
+GIT_USER="${GIT_USER:?Missing required Variable}";
 
 ## Configuration Option for the email for the user used for
 ## git actions. The variable can't be empty.
@@ -159,7 +159,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
 
       ## Setup git with the given Credentials
       ##
-      git config user.name "$CR_OWNER"
+      git config user.name "$GIT_USER"
       git config user.email "$GIT_EMAIL"
 
       ## Recreate Index for the Pages index
