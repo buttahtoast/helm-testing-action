@@ -12,7 +12,6 @@ inputs:
     required: false
     default: './cr.yaml'
 
-
   user:
     description: 'Define the user name used for commits (pages update)'
     default: "$GITHUB_ACTOR"
@@ -21,7 +20,7 @@ inputs:
   email:
     description: 'Define the user email used for commits (pages update)'
     default: "$GITHUB_ACTOR@users.noreply.github.com"
-    required: false
+
 
   ## Configuration for git-repo name
   ## Reference: https://github.com/helm/chart-releaser#environment-variables
