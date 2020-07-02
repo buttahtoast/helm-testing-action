@@ -43,7 +43,7 @@ export CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 ## the input setting. If none of both is set, the script
 ## will exit.
 ##
-export CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)}";
+export CR_GIT_REPO="${CR_GIT_REPO:-$GITHUB_REPOSITORY}";
 
 ## Configuration Option for chart directories
 ## defaults to "charts/" if the input variable
