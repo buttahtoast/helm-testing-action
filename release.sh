@@ -13,6 +13,9 @@ createDirs() {
   rm -rf .cr-index && mkdir -p .cr-index ## Recreates Index File
 }
 
+printenv
+echo $GITHUB_REPOSITORY
+
 
 
 ## Environment Variables
