@@ -5,6 +5,7 @@ latestTag() {
     if ! git describe --tags --abbrev=0 2> /dev/null; then git rev-list --max-parents=0 --first-parent HEAD; fi
 }
 
+printenv
 ## Environment Variables
 ## CR Configuration Variables (Required)
 
@@ -21,7 +22,7 @@ CR_TOKEN="${CR_TOKEN:-$INPUT_TOKEN}";
 ## repository index and expand it with
 ## new additions. The variable can't be empty.
 ##
-CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/helm-charts/}";
+CR_REPO_URL="${CR_REPO_URL:-$INPUT_REPOSITORY}";
 CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 
 ## Repository name under which the
@@ -31,7 +32,6 @@ CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 ## will exit.
 ##
 CR_GIT_REPO="${CR_GIT_REPO:-$INPUT_GIT-REPO}";
-CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)}";
 
 ## Configuration Option for chart directories
 ## defaults to "charts/" if the input variable
@@ -49,14 +49,13 @@ CR_CONFIG_LOCATION="${INPUT_CONFIG:-$HOME/.cr.yaml}"
 ## Configuration Option for the name for the user used for
 ## git actions. The variable can't be empty.
 ##
-CR_OWNER="${INPUT_USER:-$GITHUB_ACTOR}"
-CR_OWNER="${CR_OWNER:?Missing required Variable}";
+CR_OWNER="${CR_OWNER:-$INPUT_USER}"
 
 ## Configuration Option for the email for the user used for
 ## git actions. The variable can't be empty.
 ##
-GIT_EMAIL="${INPUT_EMAIL:-$GITHUB_ACTOR@users.noreply.github.com}"
-GIT_EMAIL="${GIT_EMAIL:?Missing required Variable (or use -t)}";
+GIT_EMAIL="${GIT_EMAIL:-$INPUT_EMAIL}"
+
 
 ## Not so relevant variables for
 ## the GitHub action
