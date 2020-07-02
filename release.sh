@@ -23,7 +23,7 @@ CR_TOKEN="${CR_TOKEN:-$INPUT_TOKEN}";
 ## repository index and expand it with
 ## new additions. The variable can't be empty.
 ##
-CR_REPO_URL="${CR_REPO_URL:-$INPUT_REPOSITORY}";
+CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/helm-charts/}";
 CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 
 ## Repository name under which the
@@ -33,6 +33,7 @@ CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 ## will exit.
 ##
 CR_GIT_REPO="${CR_GIT_REPO:-$INPUT_GIT-REPO}";
+CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)}";
 
 ## Configuration Option for chart directories
 ## defaults to "charts/" if the input variable
@@ -50,12 +51,14 @@ CR_CONFIG_LOCATION="${INPUT_CONFIG:-$HOME/.cr.yaml}"
 ## Configuration Option for the name for the user used for
 ## git actions. The variable can't be empty.
 ##
-CR_OWNER="${CR_OWNER:-$INPUT_USER}"
+CR_OWNER="${INPUT_USER:-$GITHUB_ACTOR}"
+CR_OWNER="${CR_OWNER:?Missing required Variable}";
 
 ## Configuration Option for the email for the user used for
 ## git actions. The variable can't be empty.
 ##
-GIT_EMAIL="${GIT_EMAIL:-$INPUT_EMAIL}"
+GIT_EMAIL="${INPUT_EMAIL:-$GITHUB_ACTOR@users.noreply.github.com}"
+GIT_EMAIL="${GIT_EMAIL:?Missing required Variable}";
 
 ## Not so relevant variables for
 ## the GitHub action
