@@ -14,15 +14,15 @@ latestTag() {
 ## environment variable 'CR_TOKEN' is prefered over
 ## the input setting.
 ##
-CR_TOKEN="${CR_TOKEN:-$INPUT_TOKEN}";
+export CR_TOKEN="${CR_TOKEN:-$INPUT_TOKEN}";
 
 ## Chart Releaser default repository URL.
 ## This URL is used to fetch the current
 ## repository index and expand it with
 ## new additions. The variable can't be empty.
 ##
-CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/helm-charts/}";
-CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
+export CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/helm-charts/}";
+export CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 
 echo $CR_REPO_URL
 
@@ -32,8 +32,8 @@ echo $CR_REPO_URL
 ## the input setting. If none of both is set, the script
 ## will exit.
 ##
-CR_GIT_REPO="${CR_GIT_REPO:-$INPUT_GIT-REPO}";
-CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)}";
+export CR_GIT_REPO="${CR_GIT_REPO:-$INPUT_GIT-REPO}";
+export CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)}";
 
 ## Configuration Option for chart directories
 ## defaults to "charts/" if the input variable
@@ -51,8 +51,8 @@ CR_CONFIG_LOCATION="${INPUT_CONFIG:-$HOME/.cr.yaml}"
 ## Configuration Option for the name for the user used for
 ## git actions. The variable can't be empty.
 ##
-CR_OWNER="${INPUT_USER:-$GITHUB_ACTOR}"
-CR_OWNER="${CR_OWNER:?Missing required Variable}";
+export CR_OWNER="${INPUT_USER:-$GITHUB_ACTOR}"
+export CR_OWNER="${CR_OWNER:?Missing required Variable}";
 
 ## Configuration Option for the email for the user used for
 ## git actions. The variable can't be empty.
@@ -65,6 +65,8 @@ GIT_EMAIL="${GIT_EMAIL:?Missing required Variable}";
 ## the GitHub action
 ##
 CR_RELEASE_LOCATION=".cr-release-packages"
+
+echo "${CR_OWNER}"
 
 printenv
 
