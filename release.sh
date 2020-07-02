@@ -5,6 +5,16 @@ latestTag() {
     if ! git describe --tags --abbrev=0 2> /dev/null; then git rev-list --max-parents=0 --first-parent HEAD; fi
 }
 
+## Function: createDirs()
+## Creates required directories
+##
+createDirs() {
+  rm -rf ${CR_RELEASE_LOCATION} && mkdir -p ${CR_RELEASE_LOCATION} ## Recreates Package Directory
+  rm -rf .cr-index && mkdir -p .cr-index ## Recreates Index File
+}
+
+
+
 ## Environment Variables
 ## CR Configuration Variables (Required)
 
@@ -62,8 +72,6 @@ GIT_EMAIL="${GIT_EMAIL:?Missing required Variable}";
 ## the GitHub action
 ##
 CR_RELEASE_LOCATION=".cr-release-packages"
-
-printenv
 
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
@@ -125,6 +133,10 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
   ## is not empty
   ##
   if [[ ${#EXISTING_CHARTS[@]} -gt 0 ]]; then
+
+      ## Create required directories
+      ##
+      createDirs
 
       ## Starting iteration for each chart to be packaged
       ## with the helm built-in function.
