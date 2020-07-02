@@ -21,7 +21,7 @@ export CR_TOKEN="${CR_TOKEN:-$INPUT_TOKEN}";
 ## repository index and expand it with
 ## new additions. The variable can't be empty.
 ##
-export CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/helm-charts/}";
+export CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)/}";
 export CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 
 ## Repository name under which the
@@ -30,7 +30,6 @@ export CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 ## the input setting. If none of both is set, the script
 ## will exit.
 ##
-export CR_GIT_REPO="${CR_GIT_REPO:-$INPUT_GIT\-REPO}";
 export CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)}";
 
 ## Configuration Option for chart directories

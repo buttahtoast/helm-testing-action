@@ -35,15 +35,8 @@ inputs:
   ## Configuration for git-repo name
   ## Reference: https://github.com/helm/chart-releaser#environment-variables
   ##
-  git-repo:
-    description: 'Define which repository will be used for the package upload (default helm-charts).'
-    required: false
-
-  ## Configuration for git-repo name
-  ## Reference: https://github.com/helm/chart-releaser#environment-variables
-  ##
   repository:
-    description: 'Define the repository url, where the index is exposed. By default we assume you are using {org/user}.github.io/helm-charts/'
+    description: 'Define the repository url, where the index is exposed. By default we assume you are using {org/user}.github.io/{repo-name}/'
     required: false
 
   ## Configuration for charts directories
