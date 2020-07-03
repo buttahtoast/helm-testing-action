@@ -1,6 +1,5 @@
 ---
 name: "Stable Release"
-
 on:
   push:
     tags:
