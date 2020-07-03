@@ -1,18 +1,15 @@
 # Helm Chart Publish
 
-This Github action allows you to publish a helm repository via Github Pages. It adds an improved Bash wrapper on top of the [Helm Chart Releaser](https://github.com/helm/chart-releaser-action). The main benefit of this wrapper  is currently, that each chart is checked if it has changes in it's `Chart.yaml` file. If not, no new release will be made. The script
-
-I am also looking into autmatic changelog creation for each chart
+This Github action allows you to publish a helm repository via Github Pages. It adds an improved Bash wrapper on top of the [Helm Chart Releaser](https://github.com/helm/chart-releaser-action). The main benefit of this wrapper  is currently, that each chart is checked if it has changes in it's `Chart.yaml` file. If not, no new release will be made. The script will create for each chart a GitHub release through Chart Releaser. The index.yaml will be updated on the `gh-pages` branch.
 
 
 ## Setup
 
 With the following steps you can use this action in your repository:
 
-  2. Create a Branch called `gh-pages` on the repository. If you want  a simple landing page you can use (jekyll)[https://jekyllrb.com/docs/pages/]. I advise you follow [this tutorial](https://pages.github.com/) if you are  new to pages.
-
-
-
+  1. Create a Branch called `gh-pages` on the repository. If you want  a simple landing page you can use (jekyll)[https://jekyllrb.com/docs/pages/]. I advise you follow [this tutorial](https://pages.github.com/) if you are new to pages.
+  2. Add this action to  your Github workflows.
+  3. Change configurations as needed.
 
 ## Variables
 
@@ -29,12 +26,33 @@ Here is a list which variables can be given/used by the script. Some values can 
 | `user` | Define the user name used for commits (pages update). | `$GIT_USER` | `$GITHUB_ACTOR` |
 | `email` | Define the user email used for commits (pages update). | `$GIT_EMAIL` | `$GITHUB_ACTOR@users.noreply.github.com` |
 
-
-
-
 ## Usage
 
+Using this action with it's default values is very easy. Just pass the Built-In `$GITHUB_TOKEN` environment  variable and you are good to go:
 
+```
+name: Helm Chart Release
+on:
+  push:
+    branches:
+      - master
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Fetch history
+        run: git fetch --prune --unshallow
+
+      - name: Helm Chart Publish
+        uses: Kubernetli/helm-release-action@master
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+```
+
+As reference, take a look at our [helm-charts](https://github.com/Kubernetli/helm-charts)  directory, we use this action as well.
 
 ## Contributing
 
