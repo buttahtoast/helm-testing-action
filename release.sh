@@ -80,31 +80,25 @@ HEAD_REV=$(git rev-parse --verify HEAD);
 LATEST_TAG_REV=$(git rev-parse --verify "$(latestTag)");
 if [[ "$LATEST_TAG_REV" == "$HEAD_REV" ]]; then echo -e "\n\e[33mNothing to do!\e[0m\n"; exit 0; fi
 
+## Instead make two seperate jobs in your action
+##
 ## Evaluate Chart directories
 ## Checks if the variable is split with ,
 ## if so, the variable is parsed as array otherwise
 ## as single directory
 ##
-if [[ ${CHART_ROOT} == *","* ]]; then
-  IFS=', ' read -r -a ROOT_DIRS <<< "${CHART_ROOT}"
-else
-  ROOT_DIRS=(${CHART_ROOT})
-fi
+#if [[ ${CHART_ROOT} == *","* ]]; then
+#  IFS=', ' read -r -a ROOT_DIRS <<< "${CHART_ROOT}"
+#else
+#  ROOT_DIRS=(${CHART_ROOT})
+#fi
 
-## Iteration over all chart directories
-## For each iteration a git diff is made comparing
-## if any Chart.yaml was changed. If so the path to
-## the chart is added to an array
+## Initialize for each directory a matching regex
+## which finds changes in the diff statement
 ##
-CHANGED_CHARTS=""
-for i in "${ROOT_DIRS[@]}"
-do
-  ## Initialize for each directory a matching regex
-  ## which finds changes in the diff statement
-  ##
-  CHART_INDICATOR="$( echo ${i%/} | tr -d '[:space:]' )/*/Chart.yaml"
-  CHANGED_CHARTS="${CHANGED_CHARTS} $(git diff --find-renames --name-only $LATEST_TAG_REV -- $CHART_INDICATOR | cut -d '/' -f 1-2 | uniq)"
-done
+CHART_INDICATOR="$( echo ${CHART_ROOT%/} | tr -d '[:space:]' )/*/Chart.yaml"
+CHANGED_CHARTS="${CHANGED_CHARTS} $(git diff --find-renames --name-only $LATEST_TAG_REV -- $CHART_INDICATOR | cut -d '/' -f 1-2 | uniq)"
+
 
 ## All changed charts are parsed as array
 ## Xargs is used to trim spaces left and right

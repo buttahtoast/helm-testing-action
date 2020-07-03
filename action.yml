@@ -41,8 +41,8 @@ inputs:
 
   ## Configuration for charts directories
   ##
-  chart-directories:
-    description: 'Define folder(s) in which the helm charts are located (comma seperated)'
+  chartRoot:
+    description: 'Charts root directory'
     default: 'charts/'
     required: false
 
