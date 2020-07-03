@@ -126,9 +126,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
   ## Branch won't be initialized and therefor throws
   ## an error on runtime.
   ##
-  if ! [ `git branch --list 'gh-pages'` ]; then
-      echo -e "\n\e[91mMissing gh-pages branch, please initialize the branch.\e[0m\n"; exit 1;
-  fi
+
 
   ## Just to be sure, checking that the array
   ## is not empty
@@ -167,7 +165,10 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ## add Index as new addition and make a signed
       ## commit to the origin
       ##
-      git checkout -f gh-pages
+      if ! [ `git checkout -f gh-pages` ]; then
+          echo -e "\n\e[91mMissing gh-pages branch, please initialize the branch.\e[0m\n"; exit 1;
+      fi
+
       cp -f .cr-index/index.yaml index.yaml || true
       git add index.yaml
       git status

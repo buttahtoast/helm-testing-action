@@ -1,13 +1,15 @@
-# helm-release-actio
+# Helm Chart Publish
 
-This action allows you to publish a helm repository via Github Pages. It adds an improved Bash wrapper on top of the [Helm Chart Releaser](https://github.com/helm/chart-releaser-action). The main benefit of this wrapper  is currently, that each chart is checked if it has changes in it's `Chart.yaml` file. If not, no new release will be made. The script
+This Github action allows you to publish a helm repository via Github Pages. It adds an improved Bash wrapper on top of the [Helm Chart Releaser](https://github.com/helm/chart-releaser-action). The main benefit of this wrapper  is currently, that each chart is checked if it has changes in it's `Chart.yaml` file. If not, no new release will be made. The script
 
 I am also looking into autmatic changelog creation for each chart
 
 
 ## Setup
 
-With the following steps  
+With the following steps you can use this action in your repository:
+
+  2. Create a Branch called `gh-pages` on the repository. If you want  a simple landing page you can use (jekyll)[https://jekyllrb.com/docs/pages/]. I advise you follow [this tutorial](https://pages.github.com/) if you are  new to pages.
 
 
 
