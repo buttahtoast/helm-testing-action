@@ -1,3 +1,4 @@
+#!/bin/bash
 ## Function: latestTag()
 ## Returns latest git tag, if any exists
 ##
@@ -9,7 +10,7 @@ latestTag() {
 ## Creates required directories
 ##
 createDirs() {
-  rm -rf ${CR_RELEASE_LOCATION} && mkdir -p ${CR_RELEASE_LOCATION} ## Recreates Package Directory
+  rm -rf "${CR_RELEASE_LOCATION}" && mkdir -p "${CR_RELEASE_LOCATION}" ## Recreates Package Directory
   rm -rf .cr-index && mkdir -p .cr-index ## Recreates Index File
 }
 
@@ -29,7 +30,7 @@ export CR_TOKEN="${CR_TOKEN:-$INPUT_TOKEN}";
 ## repository index and expand it with
 ## new additions. The variable can't be empty.
 ##
-export CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)/}";
+export CR_REPO_URL="${INPUT_REPOSITORY:-https://$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY").github.io/$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")/}";
 export CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 
 ## Repository name under which the
@@ -38,8 +39,8 @@ export CR_REPO_URL="${CR_REPO_URL:?Missing required Variable}";
 ## the input setting. If none of both is set, the script
 ## will exit.
 ##
-export CR_OWNER="${CR_OWNER:-$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY)}";
-export CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)}";
+export CR_OWNER="${CR_OWNER:-$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")}";
+export CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")}";
 
 ## Configuration Option for chart directories
 ## defaults to "charts/" if the input variable
