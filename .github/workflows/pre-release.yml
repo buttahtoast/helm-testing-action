@@ -3,9 +3,7 @@ name: Changelog Generator
 on:
   push:
     branches:
-      - init
-    tags:
-    - 'v*'
+      - master
 jobs:
 
   changelog:
