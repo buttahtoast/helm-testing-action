@@ -45,7 +45,7 @@ export CR_GIT_REPO="${CR_GIT_REPO:-$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)}";
 ## defaults to "charts/" if the input variable
 ## is unset.
 ##
-CHART_ROOT="${INPUT_CHARTDIRECTORIES:-charts/}"
+CHART_ROOT="${INPUT_CHARTROOT:-charts/}"
 
 ## Configuration Option for Chart Releaser config
 ## file. It's checked if the configuration file
