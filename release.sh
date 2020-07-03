@@ -165,7 +165,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ## add Index as new addition and make a signed
       ## commit to the origin
       ##
-      if ! [ `git checkout -f gh-pages` ]; then
+      if ! [ `git checkout -f "gh-pages"` ]; then
           echo -e "\n\e[91mMissing gh-pages branch, please initialize the branch.\e[0m\n"; exit 1;
       fi
 
