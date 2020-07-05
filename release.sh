@@ -140,7 +140,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
 
       ## Verify gh-pages branch
       ##
-      if ! [ `git show-ref -q remotes/origin/gh-pages` ]; then
+      if ! git show-ref -q remotes/origin/gh-pages; then
           echo -e "\n\e[91mMissing gh-pages branch, please initialize the branch.\e[0m\n"; exit 1;
       fi
 
