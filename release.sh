@@ -53,7 +53,7 @@ CHART_ROOT="${INPUT_CHARTROOT:-charts/}"
 ## exists, only then it's added as argument
 ##
 CR_CONFIG_LOCATION="${INPUT_CONFIG:-$HOME/.cr.yaml}"
-[ -f "${CR_CONFIG_LOCATION}" ] && CR_ARGS="--config \"${CR_CONFIG_LOCATION}\"";
+[ -f "${CR_CONFIG_LOCATION}" ] && CR_ARGS="--config ${CR_CONFIG_LOCATION}";
 
 ## Configuration Option for the name for the user used for
 ## git actions. The variable can't be empty.
@@ -120,7 +120,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
   EXISTING_CHARTS=()
   for PRE_CHART in "${PUBLISH_CHARTS[@]}"; do
       TRIM_CHART="$(echo $PRE_CHART | xargs)"
-      [ -d "$TRIM_CHART" ] && EXISTING_CHARTS+=($TRIM_CHART)
+      [ -d "$TRIM_CHART" ] && EXISTING_CHARTS+=("$TRIM_CHART")
   done
 
   ## Evaluates if gh-pages branch already exists
@@ -149,7 +149,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ##
       echo -e "\n\e[33m- Crafting Packages\e[0m"
       for CHART in "${EXISTING_CHARTS[@]}"; do
-          echo -e "\n\e[32m-- Package: $chart\e[0m"
+          echo -e "\n\e[32m-- Package: $CHART\e[0m"
           helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
       done
 
