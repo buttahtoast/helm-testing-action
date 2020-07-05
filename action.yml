@@ -1,43 +1,48 @@
 name: 'Helm Chart Publish'
 description: 'Bash Wrapper for Chart Releaser with improved functionality'
+author: 'oliverbaehler'
 branding:
   icon: 'archive'
-  color: 'blue'
+  color: 'purple'
 inputs:
+
+  ## Configuration for the personal acces token being used
+  ##
   token:
     description: 'A personal access token needed to push your site after it has been built.'
     required: true
+
+  ## Configuration fo a Chart Releaser COnfiguration
+  ## Reference:
+  ##
   config:
     description: 'Chart Releaser configuration file'
     required: false
     default: './cr.yaml'
 
-
+  ## Configuration for the git username (Release owner)
+  ##
   user:
     description: 'Define the user name used for commits (pages update)'
-    default: "$GITHUB_ACTOR"
     required: false
 
+  ## Configuration for the git email
+  ##
   email:
     description: 'Define the user email used for commits (pages update)'
-    default: "$GITHUB_ACTOR@users.noreply.github.com"
     required: false
 
   ## Configuration for git-repo name
   ## Reference: https://github.com/helm/chart-releaser#environment-variables
   ##
-  git-repo:
-    description: 'Define which repository will be used for the package upload (default helm-charts).'
-    required: false
-
   repository:
-    description: 'Define the repository url, where the index is exposed. By default we assume you are using {org/user}.github.io/helm-charts/'
-    default: "'$(https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/helm-charts/)'"
+    description: 'Define the repository url, where the index is exposed. By default we assume you are using {org/user}.github.io/{repo-name}/'
     required: false
 
-
-  chart-directories:
-    description: 'Define folder(s) in which the helm charts are located (comma seperated)'
+  ## Configuration for charts directories
+  ##
+  chartRoot:
+    description: 'Charts root directory'
     default: 'charts/'
     required: false
 
