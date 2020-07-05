@@ -6,7 +6,7 @@ on:
       - "v*"
 
 jobs:
-  tagged-release:
+  release:
     name: "Tagged Release"
     runs-on: "ubuntu-latest"
     steps:
@@ -14,6 +14,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
+
   changelog:
     runs-on: ubuntu-latest
     needs: release
