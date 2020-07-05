@@ -1,5 +1,4 @@
-## Might be useful one day :)
-name: Changelog Generator
+name: Latest Release
 on:
   push:
     branches:
