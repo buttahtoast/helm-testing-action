@@ -1,5 +1,5 @@
 ---
-name: Latest Release
+name: "Prerelease"
 on:
   push:
     branches:
