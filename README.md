@@ -7,7 +7,7 @@ This Github action allows you to publish a helm repository via Github Pages. It 
 
 With the following steps you can use this action in your repository:
 
-  1. Create a Branch called `gh-pages` on the repository. If you want  a simple landing page you can use (jekyll)[https://jekyllrb.com/docs/pages/]. I advise you follow [this tutorial](https://pages.github.com/) if you are new to pages.
+  1. Create a Branch called `gh-pages` on the repository. If you want  a simple landing page you can use [jekyll](https://jekyllrb.com/docs/pages/). I advise you follow [this tutorial](https://pages.github.com/) if you are new to pages.
   2. Add this action to  your Github workflows.
   3. Change configurations as needed.
 
@@ -19,7 +19,7 @@ Here is a list which variables can be given/used by the script. Some values can 
 |:---|:---|:---|:---|
 | `config` | Define a Chart Releaser config  file. | - | `${HOME}/cr.yaml` |
 | `chartRoot` | Define the root  directory for your charts. If you have multiple chart directories I would advise doing multiple Github jobs. | - | `charts/` |
-| `token` | Define a token which is used to create the chart releases and make changes to the gh-pages branch. | `$CR_TOKEN` | `` |
+| `token` | Define a token which is used to create the chart releases and make changes to the gh-pages branch. | `$CR_TOKEN` | - |
 | `repository` | Define where to index for the helm repository is published. This is mainly used to append new changes to an existing index via Chart Releaser. If no index is found, a new index will be created. | `$CR_REPO_URL` | `https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)/` |
 | - | Define the owner of the project. By default the current actor's name is used. | `$CR_OWNER` | `$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY)` |
 | - | Define the project, which will be updated. By default the current running project is used.  | `$CR_GIT_REPO` | `$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)` |
