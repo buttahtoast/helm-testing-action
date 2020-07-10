@@ -116,6 +116,10 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
   ## serves as simple handler when a chart is removed
   ## (if that's ever gonna happen).
   ##
+  echo "${CHANGED_CHARTS}"
+  echo "$PUBLISH_CHARTS"
+
+
   EXISTING_CHARTS=()
   for PRE_CHART in "${PUBLISH_CHARTS[@]}"; do
       TRIM_CHART="$(echo $PRE_CHART | xargs)"
