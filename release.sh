@@ -126,7 +126,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ## with the helm built-in function.
       ##
       echo -e "\n\e[33m- Crafting Packages\e[0m"
-      for CHART in "${EXISTING_CHARTS[@]}"; do
+      for CHART in "${PUBLISH_CHARTS[@]}"; do
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
           helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
       done
