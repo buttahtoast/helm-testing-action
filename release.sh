@@ -112,6 +112,21 @@ readarray -t PUBLISH_CHARTS <<< "$(echo ${CHANGED_CHARTS} | xargs )"
 ##
 if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
+  ## Check if charts exist as directory, this
+   ## serves as simple handler when a chart is removed
+   ## (if that's ever gonna happen).
+   ##
+   EXISTING_CHARTS=()
+   for PRE_CHART in "${PUBLISH_CHARTS[@]}"; do
+       TRIM_CHART="$(echo $PRE_CHART | xargs)"
+       [ -d "$TRIM_CHART" ] && EXISTING_CHARTS+=("$TRIM_CHART")
+   done
+
+   ## Just to be sure, checking that the array
+   ## is not empty
+   ##
+   if [[ ${#EXISTING_CHARTS[@]} -gt 0 ]]; then
+
       ## Create required directories
       ##
       createDirs
@@ -126,7 +141,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ## with the helm built-in function.
       ##
       echo -e "\n\e[33m- Crafting Packages\e[0m"
-      for CHART in "${PUBLISH_CHARTS[@]}"; do
+      for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
           helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
       done
@@ -156,7 +171,10 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       git status
       git commit -sm "Update index.yaml"
       git push origin gh-pages
-
+    else
+      ## Some Feedback
+      echo -e "\n\e[33mChanges to non existent chart detected.\e[0m\n"; exit 0;
+    fi
 else
   ## Some Feedback
   echo -e "\n\e[33mNo Changes on any chart detected.\e[0m\n"; exit 0;
