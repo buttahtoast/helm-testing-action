@@ -112,31 +112,6 @@ readarray -t PUBLISH_CHARTS <<< "$(echo ${CHANGED_CHARTS} | xargs )"
 ##
 if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
-  ## Check if charts exist as directory, this
-  ## serves as simple handler when a chart is removed
-  ## (if that's ever gonna happen).
-  ##
-  echo "${CHANGED_CHARTS}"
-  echo "$PUBLISH_CHARTS"
-
-
-  EXISTING_CHARTS=()
-  for PRE_CHART in "${PUBLISH_CHARTS[@]}"; do
-      TRIM_CHART="$(echo $PRE_CHART | xargs)"
-      [ -d "$TRIM_CHART" ] && EXISTING_CHARTS+=("$TRIM_CHART")
-  done
-
-  ## Evaluates if gh-pages branch already exists
-  ## Branch won't be initialized and therefor throws
-  ## an error on runtime.
-  ##
-
-
-  ## Just to be sure, checking that the array
-  ## is not empty
-  ##
-  if [[ ${#EXISTING_CHARTS[@]} -gt 0 ]]; then
-
       ## Create required directories
       ##
       createDirs
@@ -182,10 +157,6 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       git commit -sm "Update index.yaml"
       git push origin gh-pages
 
-  else
-    ## Some Feedback
-    echo -e "\n\e[33mChanges to non existent chart detected.\e[0m\n"; exit 0;
-  fi
 else
   ## Some Feedback
   echo -e "\n\e[33mNo Changes on any chart detected.\e[0m\n"; exit 0;
