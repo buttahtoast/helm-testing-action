@@ -46,6 +46,14 @@ inputs:
     default: 'charts/'
     required: false
 
+  ## Auto Generate Schema File
+  ## If no schema is present, the schema is generated automaticaly
+  ## Reference: https://github.com/karuppiah7890/helm-schema-gen
+  ##
+  schema:
+    description: 'Auto generate chart schema'
+    required: false
+
 runs:
   using: docker
   image: Dockerfile

@@ -142,6 +142,14 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ##
       echo -e "\n\e[33m- Crafting Packages\e[0m"
       for CHART in "${EXISTING_CHARTS[@]}"; do
+          ## Generate Schema File
+          if ! [ -z "${INPUT_SCHEMA}" ]; then
+            if ! [ -f "${CHART}/values.schema.json" ]; then
+              echo -e "\n\e[32m-- Generating Schema: $CHART\e[0m"
+              helm schema-gen ${CHART}/values.yaml > ${CHART}/values.schema.json
+            fi
+          fi
+
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
           helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
       done
