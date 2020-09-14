@@ -14,8 +14,11 @@ createDirs() {
   rm -rf .cr-index && mkdir -p .cr-index ## Recreates Index File
 }
 
+## Install Plugin
+helm plugin install https://github.com/karuppiah7890/helm-schema-gen
 
-helm plugin ls 
+
+helm plugin ls
 
 
 ## Environment Variables
@@ -152,7 +155,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
               echo -e "\n\e[32m-- Generating Schema: $CHART\e[0m"
               helm schema-gen ${CHART}/values.yaml > ${CHART}/values.schema.json
               if [ $? -ne 0 ]; then
-                echo -e "\n\e[31m-- Failed to generate Schema: $CHART\e[0m"
+                echo -e "\n\e[31m-- Failed to generate Schema: $CHART\e[0m" && exit 1;
               fi
             else
               echo -e "\n\e[33m-- Schema already exists: $CHART\e[0m"
