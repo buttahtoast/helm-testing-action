@@ -147,8 +147,12 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
             if ! [ -f "${CHART}/values.schema.json" ]; then
               echo -e "\n\e[32m-- Generating Schema: $CHART\e[0m"
               helm schema-gen ${CHART}/values.yaml > ${CHART}/values.schema.json
+            else
+              echo -e "\n\e[32m-- Schema already exists: $CHART\e[0m"
             fi
           fi
+
+          ## Auto Generate Documentation
 
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
           helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}

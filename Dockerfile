@@ -17,8 +17,11 @@ RUN apk add --no-cache ca-certificates curl bash git openssl && \
   ./get_helm.sh && \
   curl -sL "https://github.com/helm/chart-releaser/releases/download/v${CR_VERSION}/chart-releaser_${CR_VERSION}_linux_amd64.tar.gz" | tar zx && \
   chmod +x ./cr && \
-  mv ./cr /usr/local/bin/ && \
-  helm plugin install https://github.com/karuppiah7890/helm-schema-gen
+  mv ./cr /usr/local/bin/
+
+## Install Helm Plugins
+##
+RUN helm plugin install https://github.com/karuppiah7890/helm-schema-gen
 
 ## Execute Action Handler
 ##
