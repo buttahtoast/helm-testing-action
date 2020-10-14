@@ -87,19 +87,6 @@ HEAD_REV=$(git rev-parse --verify HEAD);
 LATEST_TAG_REV=$(git rev-parse --verify "$(latestTag)");
 if [[ "$LATEST_TAG_REV" == "$HEAD_REV" ]]; then echo -e "\n\e[33mNothing to do!\e[0m\n"; exit 0; fi
 
-## Instead make two seperate jobs in your action
-##
-## Evaluate Chart directories
-## Checks if the variable is split with ,
-## if so, the variable is parsed as array otherwise
-## as single directory
-##
-#if [[ ${CHART_ROOT} == *","* ]]; then
-#  IFS=', ' read -r -a ROOT_DIRS <<< "${CHART_ROOT}"
-#else
-#  ROOT_DIRS=(${CHART_ROOT})
-#fi
-
 ## Initialize for each directory a matching regex
 ## which finds changes in the diff statement
 ##
@@ -149,21 +136,6 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ##
       echo -e "\n\e[33m- Crafting Packages\e[0m"
       for CHART in "${EXISTING_CHARTS[@]}"; do
-          ## Generate Schema File
-          if ! [ -z "${INPUT_SCHEMA}" ]; then
-            if ! [ -f "${CHART}/values.schema.json" ]; then
-              echo -e "\n\e[32m-- Generating Schema: $CHART\e[0m"
-              helm schema-gen ${CHART}/values.yaml > ${CHART}/values.schema.json
-              if [ $? -ne 0 ]; then
-                echo -e "\n\e[31m-- Failed to generate Schema: $CHART\e[0m" && exit 1;
-              fi
-            else
-              echo -e "\n\e[33m-- Schema already exists: $CHART\e[0m"
-            fi
-          fi
-
-          ## Auto Generate Documentation
-
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
           helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
       done
