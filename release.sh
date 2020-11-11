@@ -124,6 +124,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
    EXISTING_CHARTS=()
    for PRE_CHART in "${PUBLISH_CHARTS[@]}"; do
        TRIM_CHART="$(echo $PRE_CHART | xargs)"
+       echo "here - $TRIM_CHART"
        [ -d "$TRIM_CHART" ] && EXISTING_CHARTS+=("$TRIM_CHART")
    done
 
