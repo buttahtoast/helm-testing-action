@@ -112,6 +112,7 @@ IFS=' ' read -a PUBLISH_CHARTS2 <<< "$(echo ${CHANGED_CHARTS} | xargs )"
 echo "${#PUBLISH_CHARTS[@]}"
 echo "Changed: ${PUBLISH_CHARTS[*]}"
 echo "Changed: ${PUBLISH_CHARTS2[*]}"
+echo "${#PUBLISH_CHARTS2[@]}"
 ## Checks if there were any changes made
 ## Because the variable structing is not super clean
 ## I ended up with these two checks. Might be
