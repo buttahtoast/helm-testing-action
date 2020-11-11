@@ -14,6 +14,14 @@ createDirs() {
   rm -rf .cr-index && mkdir -p .cr-index ## Recreates Index File
 }
 
+## Chart Configuration
+##
+CONFIG_NAME=".release-config"
+CONFIG_SUPPORTED_VALUES=( "ENABLE" )
+
+
+
+
 ## Install Plugin
 helm plugin install https://github.com/karuppiah7890/helm-schema-gen
 
@@ -136,8 +144,19 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       ##
       echo -e "\n\e[33m- Crafting Packages\e[0m"
       for CHART in "${EXISTING_CHARTS[@]}"; do
+
+          ## Lookup Release Configuration
+          echo "Looking ${CHART%/}/${CONFIG_NAME}"
+          if [ -f "${CHART%/}/${CONFIG_NAME}" ]; then
+             source "${CHART%/}/${CONFIG_NAME}"
+          fi
+
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
           helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
+
+          ## Unset Configuration Values
+
+
       done
 
       ## For each package made by helm cr will
