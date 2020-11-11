@@ -107,6 +107,9 @@ CHANGED_CHARTS="${CHANGED_CHARTS} $(git diff --find-renames --name-only $LATEST_
 ##
 readarray -t PUBLISH_CHARTS <<< "$(echo ${CHANGED_CHARTS} | xargs )"
 
+
+echo "Changed: ${PUBLISH_CHARTS[*]}"
+
 ## Checks if there were any changes made
 ## Because the variable structing is not super clean
 ## I ended up with these two checks. Might be
@@ -123,6 +126,8 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
        TRIM_CHART="$(echo $PRE_CHART | xargs)"
        [ -d "$TRIM_CHART" ] && EXISTING_CHARTS+=("$TRIM_CHART")
    done
+
+   echo "Existing: ${EXISTING_CHARTS[*]}"
 
    ## Just to be sure, checking that the array
    ## is not empty
