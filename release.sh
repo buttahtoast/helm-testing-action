@@ -151,16 +151,17 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
           ## Lookup Release Configuration
           if [ -f "${CHART%/}/${CONFIG_NAME}" ]; then
-             echo -e "\n--- Found Configuration"
+             echo -e "--- Found Configuration"
              source "${CHART%/}/${CONFIG_NAME}"
           fi
 
           ## Filter disabled Charts
+          echo "state: ${DISABLE}"
           if [[ -n "${DISABLE}" ]] || [[ "${DISABLE,,}" == "false" ]]; then
-             echo -e "\n--- Creating Helm Package"
+             echo -e "--- Creating Helm Package"
              helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
           else
-             echo -e "\n--- Chart Disabled"
+             echo -e "--- Chart Disabled"
           fi
 
           ## Unset Configuration Values
