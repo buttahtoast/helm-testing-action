@@ -107,7 +107,7 @@ CHANGED_CHARTS="${CHANGED_CHARTS} $(git diff --find-renames --name-only $LATEST_
 ##
 readarray -t PUBLISH_CHARTS <<< "$(echo ${CHANGED_CHARTS} | xargs )"
 
-
+echo "${#PUBLISH_CHARTS[@]}"
 echo "Changed: ${PUBLISH_CHARTS[*]}"
 
 ## Checks if there were any changes made
