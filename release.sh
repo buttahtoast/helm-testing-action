@@ -105,7 +105,7 @@ CHANGED_CHARTS="${CHANGED_CHARTS} $(git diff --find-renames --name-only $LATEST_
 ## All changed charts are parsed as array
 ## Xargs is used to trim spaces left and right
 ##
-IFS=' ' read -a PUBLISH_CHARTS2 <<< "$(echo ${CHANGED_CHARTS} | xargs )"
+IFS=' ' read -a PUBLISH_CHARTS <<< "$(echo ${CHANGED_CHARTS} | xargs )"
 
 ## Checks if there were any changes made
 ## Because the variable structing is not super clean
