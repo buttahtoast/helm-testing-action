@@ -106,10 +106,12 @@ CHANGED_CHARTS="${CHANGED_CHARTS} $(git diff --find-renames --name-only $LATEST_
 ## Xargs is used to trim spaces left and right
 ##
 readarray -t PUBLISH_CHARTS <<< $(echo ${CHANGED_CHARTS} | xargs )
+IFS=' ' read -a PUBLISH_CHARTS2 <<< "$(echo ${CHANGED_CHARTS} | xargs )"
+
 
 echo "${#PUBLISH_CHARTS[@]}"
 echo "Changed: ${PUBLISH_CHARTS[*]}"
-
+echo "Changed: ${PUBLISH_CHARTS2[*]}"
 ## Checks if there were any changes made
 ## Because the variable structing is not super clean
 ## I ended up with these two checks. Might be
