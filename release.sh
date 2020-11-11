@@ -105,20 +105,14 @@ CHANGED_CHARTS="${CHANGED_CHARTS} $(git diff --find-renames --name-only $LATEST_
 ## All changed charts are parsed as array
 ## Xargs is used to trim spaces left and right
 ##
-readarray -t PUBLISH_CHARTS <<< $(echo ${CHANGED_CHARTS} | xargs )
 IFS=' ' read -a PUBLISH_CHARTS2 <<< "$(echo ${CHANGED_CHARTS} | xargs )"
 
-
-echo "${#PUBLISH_CHARTS[@]}"
-echo "Changed: ${PUBLISH_CHARTS[*]}"
-echo "Changed: ${PUBLISH_CHARTS2[*]}"
-echo "${#PUBLISH_CHARTS2[@]}"
 ## Checks if there were any changes made
 ## Because the variable structing is not super clean
 ## I ended up with these two checks. Might be
 ## improved in the future
 ##
-if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
+if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
   ## Check if charts exist as directory, this
    ## serves as simple handler when a chart is removed
