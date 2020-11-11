@@ -153,7 +153,7 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
           fi
 
           ## Filter disabled Charts
-          if [ -n "${DISABLE}" ]; then
+          if [[ -n "${DISABLE}" ]] || [[ "${DISABLE,,}" == "false" ]]; then
              echo -e "\n--- Creating Helm Package"
              helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
           else
