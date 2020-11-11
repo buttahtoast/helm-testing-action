@@ -157,6 +157,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
           ## Filter disabled Charts
           echo "state: ${DISABLE}"
+          if [[ "${DISABLE,,}" == "false" ]]; then echo "DISABLE"; fi
           if [[ -n "${DISABLE}" ]] || [[ "${DISABLE,,}" == "false" ]]; then
              echo -e "--- Creating Helm Package"
              helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
