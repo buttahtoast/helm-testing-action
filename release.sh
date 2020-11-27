@@ -163,7 +163,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           SCHEMA_PATH="${CHART%/}/values.schema.json"
           if ! [[ -n "${GENERATE_SCHEMA}" ]] || [[ "${GENERATE_SCHEMA,,}" == "true" ]]; then
              echo -e "--- Attempt to generate Values Schema"
-             if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]];
+             if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
                echo -e "--- Generating Values Schema"
                helm schema-gen ${SCHEMA_VALUES:"values.yaml"} > "${SCHEMA_PATH}"
              else
