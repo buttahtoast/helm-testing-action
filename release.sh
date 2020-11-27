@@ -152,11 +152,11 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           fi
 
           ## Filter disabled Charts
-          if ! [[ -n "${DISABLE}" ]] || [[ "${DISABLE,,}" == "false" ]]; then
+          if [[ "${DISABLE,,}" == "true" ]]; then
+             echo -e "--- Chart Disabled"
+          else
              echo -e "--- Creating Helm Package"
              helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
-          else
-             echo -e "--- Chart Disabled"
           fi
 
           ## Chart Schema Generator
