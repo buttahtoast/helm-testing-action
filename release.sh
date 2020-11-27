@@ -16,18 +16,12 @@ createDirs() {
 
 ## Chart Configuration
 ##
-CONFIG_NAME=".release-config"
-CONFIG_SUPPORTED_VALUES=( "DISABLE" )
+CONFIG_NAME=${INPUT_CHARTCONFIG:-".chart-config"}
+CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" )
 
-
-
-
-## Install Plugin
+## Install Helm Plugins
+##
 helm plugin install https://github.com/karuppiah7890/helm-schema-gen
-
-
-helm plugin ls
-
 
 ## Environment Variables
 ## CR Configuration Variables (Required)
@@ -150,14 +144,14 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
 
           ## Lookup Release Configuration
-          if [ -f "${CHART%/}/${CONFIG_NAME}" ]; then
+          c_config="${CHART%/}/${CONFIG_NAME}"
+          echo -e "--- Configuration lookup ($c_config)"
+          if [ -f "$c_config" ]; then
              echo -e "--- Found Configuration"
-             source "${CHART%/}/${CONFIG_NAME}"
+             source "$c_config"
           fi
 
           ## Filter disabled Charts
-          echo "state: ${DISABLE}"
-          if [[ "${DISABLE,,}" == "false" ]]; then echo "DISABLE"; fi
           if ! [[ -n "${DISABLE}" ]] || [[ "${DISABLE,,}" == "false" ]]; then
              echo -e "--- Creating Helm Package"
              helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
@@ -165,9 +159,20 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
              echo -e "--- Chart Disabled"
           fi
 
+          ## Chart Schema Generator
+          SCHEMA_PATH="${CHART%/}/values.schema.json"
+          if ! [[ -n "${GENERATE_SCHEMA}" ]] || [[ "${GENERATE_SCHEMA,,}" == "true" ]]; then
+             echo -e "--- Attempt to generate Values Schema"
+             if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]];
+               echo -e "--- Generating Values Schema"
+               helm schema-gen ${SCHEMA_VALUES:"values.yaml"} > "${SCHEMA_PATH}"
+             else
+               echo -e "--- Skipping Values Schema"
+             fi
+          fi
+
           ## Unset Configuration Values
           unset $(echo "${CONFIG_SUPPORTED_VALUES[*]}")
-
       done
 
       ## For each package made by helm cr will
