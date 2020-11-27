@@ -181,7 +181,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## create a helm release on the GitHub Repository
       ##
       echo -e "\n\e[33m- Creating Releases\e[0m\n"
-      if [ -f "${CR_RELEASE_LOCATION}" ]; then
+      if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
         if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
         ## Setup git with the given Credentials
