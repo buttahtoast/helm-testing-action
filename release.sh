@@ -165,10 +165,12 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
              echo -e "--- Attempt to generate Values Schema"
              if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
                echo -e "--- Generating Values Schema"
-               helm schema-gen ${SCHEMA_VALUES:"values.yaml"} > "${SCHEMA_PATH}"
+               helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"
              else
                echo -e "--- Skipping Values Schema"
              fi
+          else
+            echo -e "--- Values Schema Disabled"
           fi
 
           ## Unset Configuration Values
@@ -203,7 +205,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
         git push origin gh-pages
       else
         echo "Nothing to release" && exit 0
-      fi    
+      fi
     else
       ## Some Feedback
       echo -e "\n\e[33mChanges to non existent chart detected.\e[0m\n"; exit 0;
