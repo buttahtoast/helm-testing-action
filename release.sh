@@ -115,11 +115,8 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
    EXISTING_CHARTS=()
    for PRE_CHART in "${PUBLISH_CHARTS[@]}"; do
        TRIM_CHART="$(echo $PRE_CHART | xargs)"
-       echo "here - $TRIM_CHART"
        [ -d "$TRIM_CHART" ] && EXISTING_CHARTS+=("$TRIM_CHART")
    done
-
-   echo "Existing: ${EXISTING_CHARTS[*]}"
 
    ## Just to be sure, checking that the array
    ## is not empty
@@ -148,6 +145,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           echo -e "--- Configuration lookup ($c_config)"
           if [ -f "$c_config" ]; then
              echo -e "--- Found Configuration"
+             # shellcheck source=/dev/null
              source "$c_config"
           fi
 
@@ -174,7 +172,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           fi
 
           ## Unset Configuration Values
-          unset $(echo "${CONFIG_SUPPORTED_VALUES[*]}")
+          unset "$(echo ${CONFIG_SUPPORTED_VALUES[*]})"
       done
 
       ## For each package made by helm cr will
