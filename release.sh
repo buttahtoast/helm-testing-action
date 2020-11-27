@@ -161,7 +161,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
           ## Chart Schema Generator
           SCHEMA_PATH="${CHART%/}/values.schema.json"
-          if ! [[ -n "${GENERATE_SCHEMA}" ]] || [[ "${GENERATE_SCHEMA,,}" == "true" ]]; then
+          if [[ "${GENERATE_SCHEMA,,}" == "true" ]]; then
              echo -e "--- Attempt to generate Values Schema"
              if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
                echo -e "--- Generating Values Schema"
@@ -179,27 +179,31 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## create a helm release on the GitHub Repository
       ##
       echo -e "\n\e[33m- Creating Releases\e[0m\n"
-      if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+      if [ -f "${CR_RELEASE_LOCATION}" ]; then
+        if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
-      ## Setup git with the given Credentials
-      ##
-      git config user.name "$GIT_USER"
-      git config user.email "$GIT_EMAIL"
+        ## Setup git with the given Credentials
+        ##
+        git config user.name "$GIT_USER"
+        git config user.email "$GIT_EMAIL"
 
-      ## Recreate Index for the Pages index
-      ##
-      if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+        ## Recreate Index for the Pages index
+        ##
+        if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
-      ## Checkout the pages branch and
-      ## add Index as new addition and make a signed
-      ## commit to the origin
-      ##
-      git checkout -f gh-pages
-      cp -f .cr-index/index.yaml index.yaml || true
-      git add index.yaml
-      git status
-      git commit -sm "Update index.yaml"
-      git push origin gh-pages
+        ## Checkout the pages branch and
+        ## add Index as new addition and make a signed
+        ## commit to the origin
+        ##
+        git checkout -f gh-pages
+        cp -f .cr-index/index.yaml index.yaml || true
+        git add index.yaml
+        git status
+        git commit -sm "Update index.yaml"
+        git push origin gh-pages
+      else
+        echo "Nothing to release" && exit 0
+      fi    
     else
       ## Some Feedback
       echo -e "\n\e[33mChanges to non existent chart detected.\e[0m\n"; exit 0;
