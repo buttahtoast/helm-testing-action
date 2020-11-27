@@ -155,22 +155,22 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           if [[ "${DISABLE,,}" == "true" ]]; then
              echo -e "--- Chart Disabled"
           else
+             ## Chart Schema Generator
+             SCHEMA_PATH="${CHART%/}/values.schema.json"
+             if [[ "${SCHEMA_GENERATE,,}" == "true" ]]; then
+                echo -e "--- Attempt to generate Values Schema"
+                if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
+                  echo -e "--- Generating Values Schema"
+                  helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"
+                else
+                  echo -e "--- Skipping Values Schema"
+                fi
+             else
+               echo -e "--- Values Schema Disabled"
+             fi
+
              echo -e "--- Creating Helm Package"
              helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
-          fi
-
-          ## Chart Schema Generator
-          SCHEMA_PATH="${CHART%/}/values.schema.json"
-          if [[ "${GENERATE_SCHEMA,,}" == "true" ]]; then
-             echo -e "--- Attempt to generate Values Schema"
-             if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
-               echo -e "--- Generating Values Schema"
-               helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"
-             else
-               echo -e "--- Skipping Values Schema"
-             fi
-          else
-            echo -e "--- Values Schema Disabled"
           fi
 
           ## Unset Configuration Values
