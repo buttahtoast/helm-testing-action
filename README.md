@@ -16,9 +16,9 @@ With the following steps you can use this action in your repository:
 Here is a list which variables can be given/used by the script. Some values can be set over action input values. If not, there's an environment variable to change the behavior.
 
 | Input | Description | Environment Variable | Default |
-| :---- | :---------- | :------------------- | :---- --|
+| :---- | :---------- | :------------------- | :------ |
 | `config` | Define a Chart Releaser config  file. | - | `${HOME}/cr.yaml` |
-| `chartConfig` | Define filename for Chart Configurations | - | `.chart-config` |
+| `chartConfig` | Define filename for [Chart Configurations](#chart-configuration) | - | `.chart-config` |
 | `chartRoot` | Define the root  directory for your charts. If you have multiple chart directories I would advise doing multiple Github jobs. | - | `charts/` |
 | `token` | Define a token which is used to create the chart releases and make changes to the gh-pages branch. | `$CR_TOKEN` | - |
 | `repository` | Define where to index for the helm repository is published. This is mainly used to append new changes to an existing index via Chart Releaser. If no index is found, a new index will be created. | `$CR_REPO_URL` | `https://$(cut -d '/' -f 1 <<< $GITHUB_REPOSITORY).github.io/$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)/` |
