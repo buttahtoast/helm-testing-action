@@ -48,6 +48,15 @@ Disable a chart (Won't create a new release)
 DISABLE=true
 ```
 
+Enable enforced Schema Generation
+
+**charts/sample-chart-2/.chart-config**
+
+```
+SCHEMA_GENERATE=true
+SCHEMA_FORCE=true
+```
+
 ## Usage
 
 Using this action with it's default values is very easy. Just pass the Built-In `$GITHUB_TOKEN` environment  variable and you are good to go:
