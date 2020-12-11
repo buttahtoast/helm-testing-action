@@ -13,12 +13,18 @@ inputs:
     required: true
 
   ## Configuration fo a Chart Releaser COnfiguration
-  ## Reference:
   ##
   config:
     description: 'Chart Releaser configuration file'
     required: false
     default: './cr.yaml'
+
+  ## Chart Configuration filename
+  ##
+  chartConfig:
+    description: 'Chart Configuration file'
+    required: false
+
 
   ## Configuration for the git username (Release owner)
   ##

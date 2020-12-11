@@ -19,6 +19,10 @@ RUN apk add --no-cache ca-certificates curl bash git openssl && \
   chmod +x ./cr && \
   mv ./cr /usr/local/bin/
 
+## Install Helm Plugins
+##
+RUN helm plugin install https://github.com/karuppiah7890/helm-schema-gen
+
 ## Execute Action Handler
 ##
 CMD [ "bash", "/usr/local/src/release.sh" ]

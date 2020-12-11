@@ -14,6 +14,15 @@ createDirs() {
   rm -rf .cr-index && mkdir -p .cr-index ## Recreates Index File
 }
 
+## Chart Configuration
+##
+CONFIG_NAME=${INPUT_CHARTCONFIG:-".chart-config"}
+CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" )
+
+## Install Helm Plugins
+##
+helm plugin install https://github.com/karuppiah7890/helm-schema-gen
+
 ## Environment Variables
 ## CR Configuration Variables (Required)
 
@@ -80,19 +89,6 @@ HEAD_REV=$(git rev-parse --verify HEAD);
 LATEST_TAG_REV=$(git rev-parse --verify "$(latestTag)");
 if [[ "$LATEST_TAG_REV" == "$HEAD_REV" ]]; then echo -e "\n\e[33mNothing to do!\e[0m\n"; exit 0; fi
 
-## Instead make two seperate jobs in your action
-##
-## Evaluate Chart directories
-## Checks if the variable is split with ,
-## if so, the variable is parsed as array otherwise
-## as single directory
-##
-#if [[ ${CHART_ROOT} == *","* ]]; then
-#  IFS=', ' read -r -a ROOT_DIRS <<< "${CHART_ROOT}"
-#else
-#  ROOT_DIRS=(${CHART_ROOT})
-#fi
-
 ## Initialize for each directory a matching regex
 ## which finds changes in the diff statement
 ##
@@ -103,14 +99,14 @@ CHANGED_CHARTS="${CHANGED_CHARTS} $(git diff --find-renames --name-only $LATEST_
 ## All changed charts are parsed as array
 ## Xargs is used to trim spaces left and right
 ##
-readarray -t PUBLISH_CHARTS <<< "$(echo ${CHANGED_CHARTS} | xargs )"
+IFS=' ' read -a PUBLISH_CHARTS <<< "$(echo ${CHANGED_CHARTS} | xargs )"
 
 ## Checks if there were any changes made
 ## Because the variable structing is not super clean
 ## I ended up with these two checks. Might be
 ## improved in the future
 ##
-if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
+if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
   ## Check if charts exist as directory, this
    ## serves as simple handler when a chart is removed
@@ -143,34 +139,71 @@ if ! [[ -z $(echo "${CHANGED_CHARTS}" | xargs) ]] && [[ ${#PUBLISH_CHARTS[@]} -g
       echo -e "\n\e[33m- Crafting Packages\e[0m"
       for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
-          helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
+
+          ## Lookup Release Configuration
+          c_config="${CHART%/}/${CONFIG_NAME}"
+          echo -e "--- Configuration lookup ($c_config)"
+          if [ -f "$c_config" ]; then
+             echo -e "--- Found Configuration"
+             # shellcheck source=/dev/null
+             source "$c_config"
+          fi
+
+          ## Filter disabled Charts
+          if [[ "${DISABLE,,}" == "true" ]]; then
+             echo -e "--- Chart Disabled"
+          else
+             ## Chart Schema Generator
+             SCHEMA_PATH="${CHART%/}/values.schema.json"
+             if [[ "${SCHEMA_GENERATE,,}" == "true" ]]; then
+                echo -e "--- Attempt to generate Values Schema"
+                if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
+                  echo -e "--- Generating Values Schema"
+                  helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"
+                else
+                  echo -e "--- Skipping Values Schema"
+                fi
+             else
+               echo -e "--- Values Schema Disabled"
+             fi
+
+             echo -e "--- Creating Helm Package"
+             helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
+          fi
+
+          ## Unset Configuration Values
+          unset "$(echo ${CONFIG_SUPPORTED_VALUES[*]})"
       done
 
       ## For each package made by helm cr will
       ## create a helm release on the GitHub Repository
       ##
       echo -e "\n\e[33m- Creating Releases\e[0m\n"
-      if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+      if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
+        if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
-      ## Setup git with the given Credentials
-      ##
-      git config user.name "$GIT_USER"
-      git config user.email "$GIT_EMAIL"
+        ## Setup git with the given Credentials
+        ##
+        git config user.name "$GIT_USER"
+        git config user.email "$GIT_EMAIL"
 
-      ## Recreate Index for the Pages index
-      ##
-      if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+        ## Recreate Index for the Pages index
+        ##
+        if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
-      ## Checkout the pages branch and
-      ## add Index as new addition and make a signed
-      ## commit to the origin
-      ##
-      git checkout -f gh-pages
-      cp -f .cr-index/index.yaml index.yaml || true
-      git add index.yaml
-      git status
-      git commit -sm "Update index.yaml"
-      git push origin gh-pages
+        ## Checkout the pages branch and
+        ## add Index as new addition and make a signed
+        ## commit to the origin
+        ##
+        git checkout -f gh-pages
+        cp -f .cr-index/index.yaml index.yaml || true
+        git add index.yaml
+        git status
+        git commit -sm "Update index.yaml"
+        git push origin gh-pages
+      else
+        echo "Nothing to release" && exit 0
+      fi
     else
       ## Some Feedback
       echo -e "\n\e[33mChanges to non existent chart detected.\e[0m\n"; exit 0;
