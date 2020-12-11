@@ -34,7 +34,7 @@ Certain configurations are required on chart basis. With the following variables
 | Variable | Description | Values |
 | :------- | :---------- | :----- |
 | `DISABLE` | Disables the chart during the release process. | `true`/`false` |
-| `SCHEMA_GENERATE` | Disables the chart during the release process. | `true`/`false` |
+| `SCHEMA_GENERATE` | Generates Schema with [helm-schema-gen](https://github.com/karuppiah7890/helm-schema-gen) if no values.schema.json file exists. | `true`/`false` |
 | `SCHEMA_VALUES` | Define the location of the values file within the chart directory, which is used to generate the values schema. | `values.yaml` |
 | `SCHEMA_FORCE` | If there is already a `values.schema.json` file present in the chart directory, no schema will be generated. This option forces to generate the schema and overwrite present schema files. | `true`/`false` |
 
