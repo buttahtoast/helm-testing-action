@@ -21,7 +21,7 @@ helm plugin install https://github.com/karuppiah7890/helm-schema-gen
 ## Chart Configuration
 ##
 CONFIG_NAME=${INPUT_CHARTCONFIG:-".chart-config"}
-CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "KUBE_LINTER_DISABLE" "KUBE_LINTER_CONFIG" )
+CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "KUBE_LINTER_DISABLE" "KUBE_LINTER_CONFIG" "KUBE_LINTER_ALLOW_FAIL" )
 
 ## Environment Variables
 ## CR Configuration Variables (Required)
@@ -166,7 +166,10 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             echo -e "--- Chart Disabled"
           else
 
+            ##
             ## Kube Linter
+            ##
+
             if [[ "${KUBE_LINTER_DISABLE,,}" == "true" || "${INPUT_KUBELINTERDISABLE,,}" == "true" ]]; then
               echo -e "--- Kube-Linter Disabled"
             else
@@ -174,7 +177,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               EXTRA_ARGS=""
               if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
                 EXTRA_ARGS="--config ${INPUT_KUBELINTERDEFAULTCONFIG}"
-                echo -e "--- Using Chart Kube-Linter Config (${INPUT_KUBELINTERDEFAULTCONFIG})"
+                echo -e "--- Using Global Kube-Linter Config (${INPUT_KUBELINTERDEFAULTCONFIG})"
               else
                 echo -e "\e[33m--- Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG}).\e[0m";
               fi
@@ -183,10 +186,10 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               if [ -f "${CHART_KUBE_LINTER_CONFIG}" ]; then
                 if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
                   echo -e "--- Merge with Global Kube-Linter configuration"
-                  spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > out
-                  cat out
+                  spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > ${CHART_KUBE_LINTER_CONFIG}
+                  cat ${CHART_KUBE_LINTER_CONFIG}
                 fi
-                EXTRA_ARGS="--config ${CHART%/}/${LINTER_CONFIG}"
+                EXTRA_ARGS="--config ${CHART_KUBE_LINTER_CONFIG}"
                 echo -e "--- Using Chart Kube-Linter Config (${CHART_KUBE_LINTER_CONFIG}). Overwrites Global Configuration."
               else
                 echo -e "\e[33m--- Chart Kube-Linter Config not found (${CHART_KUBE_LINTER_CONFIG}).\e[0m";
@@ -196,10 +199,23 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
                 echo -e "--- Kube-Linter Succeded\n"
               else
-                CHARTS_ERR+=("${CHART}");
-                echo -e "\n\e[91m--- Chart linting failed![0m\n";
+                if [ -n "$KUBE_LINTER_ALLOW_FAIL" ]; then
+                  CHARTS_ERR+=("${CHART}");
+                  echo -e "\n\e[91m--- Chart linting failed![0m\n";
+                else
+                  echo -e "\e[33m--- Chart linting allowed to fail!\e[0m";
+                fi
               fi
             fi
+
+            ##
+            ## Helm Unit Tests
+            ##
+
+
+
+
+
 
             ## Chart Schema Generator
             SCHEMA_PATH="${CHART%/}/values.schema.json"
