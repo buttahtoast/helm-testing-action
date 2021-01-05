@@ -189,7 +189,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                   if spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > "${CHART%/}/merged-kube-linter"; then
                     EXTRA_ARGS="--config ${CHART%/}/merged-kube-linter"
                   else
-                    echo "Merge FAILED"
+                    CHARTS_ERR+=("${CHART}");
                   fi
                 else
                   EXTRA_ARGS="--config ${CHART_KUBE_LINTER_CONFIG}"
@@ -263,17 +263,17 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       if [ ${#CHARTS_ERR[@]} -eq 0 ]; then
         echo -e "-- No Chart contained errors"
       else
+        echo "Errors found with charts"
+        echo -e "\n\e[91m----------------------------"
+        printf '  * "${my_array[@]}"'
+        echo -e "----------------------------\e[0m\n"
 
-
-
-
-          if [ -z "${INPUT_FORCE}" ]; then
-            echo -e "\n\e[91m-- Errors with charts detected\e[0m\n";
-            exit 1;
-          else
-            echo -e "-- Forcing Publish";
-          fi
-
+        if [ -z "${INPUT_FORCE}" ]; then
+          echo -e "\n\e[91m-- Errors with charts detected\e[0m\n";
+          exit 1;
+        else
+          echo -e "-- Forcing Publish";
+        fi
       fi
 
 
