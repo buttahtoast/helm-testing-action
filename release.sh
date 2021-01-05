@@ -163,7 +163,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           else
 
             ## Kube Linter
-            if [[ "${LINTER_DISABLE,,}" == "true" || "${INPUT_LINTER\-DISABLE,,}" == "true" ]]; then
+            if [[ "${LINTER_DISABLE,,}" == "true" || "${INPUT_LINTER-DISABLE,,}" == "true" ]]; then
               echo -e "--- Kube-Linter Disabled"
             else
               echo -e "--- Kube-Linter Enabled"
