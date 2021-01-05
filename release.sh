@@ -34,7 +34,7 @@ log() {
 ## Colors
 ## Different Colors Codes
 NONE='\033[0m'
-YELO='\033[1;33m'
+YLW='\033[1;33m'
 BLUE='\033[1;34m'
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -169,7 +169,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## with the helm built-in function.
       ##
       CHARTS_ERR=()
-      echo -e "${GREEN}- Crafting Packages${NONE}\n"
+      echo -e "\n${GREEN}- Crafting Packages${NONE}\n"
       for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "${YLW}-- Package: $CHART${NONE}\n"
 
