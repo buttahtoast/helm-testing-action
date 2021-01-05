@@ -28,7 +28,7 @@ breakChart() {
 log() {
   COLOR=""
   [ -z "${2}" ] && COLOR="${NONE}"
-  echo -e "$NONE -- ${1}$NONE"
+  echo -e "$COLOR -- ${1}$NONE"
 }
 
 
