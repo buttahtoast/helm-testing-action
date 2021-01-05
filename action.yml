@@ -52,6 +52,29 @@ inputs:
     default: 'charts/'
     required: false
 
+  ## Configuration for Dry Run
+  ##
+  dryrun:
+    description: 'Run Publishing Action without publishing charts'
+    required: false
+
+  ## Configuration for Force
+  ##
+  force:
+    description: 'Force publishing even if charts had errors (publish charts without error)'
+    required: false
+
+  ## Configuration Kube Linter
+  ##
+  linter-disable:
+    required: false
+
+  ## Configuration Kube Linter
+  ## Define a default Configuration used for all charts, if none defined.
+  linter-default-config:
+    required: false
+
+
 runs:
   using: docker
   image: Dockerfile

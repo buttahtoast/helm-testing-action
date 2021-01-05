@@ -14,14 +14,14 @@ createDirs() {
   rm -rf .cr-index && mkdir -p .cr-index ## Recreates Index File
 }
 
-## Chart Configuration
-##
-CONFIG_NAME=${INPUT_CHARTCONFIG:-".chart-config"}
-CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" )
-
 ## Install Helm Plugins
 ##
 helm plugin install https://github.com/karuppiah7890/helm-schema-gen
+
+## Chart Configuration
+##
+CONFIG_NAME=${INPUT_CHARTCONFIG:-".chart-config"}
+CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "LINTER_DISABLE" "LINTER_CONFIG" )
 
 ## Environment Variables
 ## CR Configuration Variables (Required)
@@ -81,6 +81,13 @@ GIT_EMAIL="${GIT_EMAIL:?Missing required Variable}";
 ##
 CR_RELEASE_LOCATION=".cr-release-packages"
 
+## Dry Run Mode
+##
+DRY_RUN=${INPUT_DRYRUN}
+
+env
+
+
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
 ##
@@ -136,6 +143,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## Starting iteration for each chart to be packaged
       ## with the helm built-in function.
       ##
+      CHARTS_ERR=()
       echo -e "\n\e[33m- Crafting Packages\e[0m"
       for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
@@ -151,58 +159,124 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
           ## Filter disabled Charts
           if [[ "${DISABLE,,}" == "true" ]]; then
-             echo -e "--- Chart Disabled"
+            echo -e "--- Chart Disabled"
           else
-             ## Chart Schema Generator
-             SCHEMA_PATH="${CHART%/}/values.schema.json"
-             if [[ "${SCHEMA_GENERATE,,}" == "true" ]]; then
-                echo -e "--- Attempt to generate Values Schema"
-                if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
-                  echo -e "--- Generating Values Schema"
-                  helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"
-                else
-                  echo -e "--- Skipping Values Schema"
-                fi
-             else
-               echo -e "--- Values Schema Disabled"
-             fi
 
+            ## Kube Linter
+            if [[ "${LINTER_DISABLE,,}" == "true" ]]; then
+              echo -e "--- Kube-Linter Disabled"
+            else
+              echo -e "--- Kube-Linter Enabled"
+              EXTRA_ARGS=""
+              if [ -z "${LINTER_CONFIG}" ]; then
+                if [ -f "${CHART%/}/${LINTER_CONFIG}"]; then
+                  EXTRA_ARGS="--config ${CHART%/}/${LINTER_CONFIG}"
+                  echo -e "--- Using Kube-Linter Config (${CHART%/}/${LINTER_CONFIG})"
+                else
+                  echo -e "\e[33m--- Kube-Linter Config not found (${CHART%/}/${LINTER_CONFIG}).\e[0m";
+                fi
+              fi
+              echo -e "--- Kube-Linter linting\n"
+              if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
+                echo -e "--- Kube-Linter Succeded\n"
+              else
+                CHARTS_ERR+=("${CHART}");
+                echo -e "\n\e[91m--- Chart linting failed![0m\n";
+              fi
+            fi
+
+            ## Chart Schema Generator
+            SCHEMA_PATH="${CHART%/}/values.schema.json"
+            if [[ "${SCHEMA_GENERATE,,}" == "true" ]]; then
+              echo -e "--- Attempt to generate Values Schema"
+              if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
+                echo -e "--- Generating Values Schema"
+                if ! helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"; then
+                   echo -e "\n\e[91m--- Generating Schema failed![0m\n";
+                   CHARTS_ERR+=("${CHART}");
+                fi
+              else
+                echo -e "--- Skipping Values Schema"
+              fi
+            else
+             echo -e "--- Values Schema Disabled"
+            fi
+
+            if [ -z "$DRY_RUN" ]; then
              echo -e "--- Creating Helm Package"
-             helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}
+             if ! helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
+               echo -e "\n\e[91m--- Generating Package failed![0m\n";
+               CHARTS_ERR+=("${CHART}");
+             fi
+            else
+             echo -e "--- Dry Run..."
+            fi
           fi
 
           ## Unset Configuration Values
           unset "$(echo ${CONFIG_SUPPORTED_VALUES[*]})"
       done
 
+
+
+      ## Check Chart Errors
+      ##
+      echo -e "\n\e[33m- Checking for Errors\e[0m\n"
+      if [ ${#CHARTS_ERR[@]} -eq 0 ]; then
+        echo -e "-- No Chart contained errors"
+      else
+
+
+
+
+          if [ -z "${INPUT_FORCE}" ]; then
+            echo -e "\n\e[91m-- Errors with charts detected\e[0m\n";
+            exit 1;
+          else
+            echo -e "-- Forcing Publish";
+          fi
+
+      fi
+
+
+
+
+
+
+
       ## For each package made by helm cr will
       ## create a helm release on the GitHub Repository
       ##
       echo -e "\n\e[33m- Creating Releases\e[0m\n"
-      if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
-        if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+      if [ -z "$DRY_RUN" ]; then
+        if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
+          if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
-        ## Setup git with the given Credentials
-        ##
-        git config user.name "$GIT_USER"
-        git config user.email "$GIT_EMAIL"
+          ## Setup git with the given Credentials
+          ##
+          git config user.name "$GIT_USER"
+          git config user.email "$GIT_EMAIL"
 
-        ## Recreate Index for the Pages index
-        ##
-        if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+          ## Recreate Index for the Pages index
+          ##
+          if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
 
-        ## Checkout the pages branch and
-        ## add Index as new addition and make a signed
-        ## commit to the origin
-        ##
-        git checkout -f gh-pages
-        cp -f .cr-index/index.yaml index.yaml || true
-        git add index.yaml
-        git status
-        git commit -sm "Update index.yaml"
-        git push origin gh-pages
+          ## Checkout the pages branch and
+          ## add Index as new addition and make a signed
+          ## commit to the origin
+          ##
+          git checkout -f gh-pages
+          cp -f .cr-index/index.yaml index.yaml || true
+          git add index.yaml
+          git status
+          git commit -sm "Update index.yaml"
+          git push origin gh-pages
+        else
+          echo "Nothing to release" && exit 0
+        fi
       else
-        echo "Nothing to release" && exit 0
+        echo -e "Dry Run...";
+        exit 0;
       fi
     else
       ## Some Feedback
