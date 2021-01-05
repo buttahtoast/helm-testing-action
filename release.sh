@@ -26,8 +26,9 @@ breakChart() {
 ## Logs normal output
 ##
 log() {
-  $COLOR="${2:-$NONE}"
-  echo "${COLOR}"
+  $COLOR="${2}"
+  [ -z "$COLOR" ] && COLOR="${NONE}"
+  echo "t ${COLOR}"
   echo -e "$COLOR--- ${1}$NONE"
 }
 
