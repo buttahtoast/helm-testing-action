@@ -162,6 +162,8 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             echo -e "--- Chart Disabled"
           else
 
+            echo "OUT ${INPUT_LINTER-DISABLE,,}"
+
             ## Kube Linter
             if [[ "${LINTER_DISABLE,,}" == "true" || "${INPUT_LINTER-DISABLE,,}" == "true" ]]; then
               echo -e "--- Kube-Linter Disabled"
