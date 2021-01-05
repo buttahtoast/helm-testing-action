@@ -263,21 +263,16 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       if [ ${#CHARTS_ERR[@]} -eq 0 ]; then
         echo -e "-- No Chart contained errors"
       else
-        echo "Errors found with charts"
-        echo -e "\e[91m----------------------------\n"
+        echo "Errors found with charts (Check above output)"
+        echo -e "\e[91m----------------------------\e[0m\n"
         printf '* %s  \n' "${CHARTS_ERR[@]}"
-        echo -e "---------------------------\e[0m\n"
-
+        echo -e "\e[91m---------------------------\e[0m\n"
         if [ -z "${INPUT_FORCE}" ]; then
-          echo -e "\n\e[91m-- Errors with charts detected\e[0m\n";
           exit 1;
         else
           echo -e "-- Forcing Publish";
         fi
       fi
-
-
-
 
 
 
