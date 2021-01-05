@@ -84,7 +84,7 @@ CR_RELEASE_LOCATION=".cr-release-packages"
 ## Dry Run Mode
 ##
 DRY_RUN=${INPUT_DRYRUN}
-
+CHART_KUBE_LINTER_CONFIG="${INPUT_CHARTROOT:-.kube-linter.yaml}"
 env
 
 
@@ -148,6 +148,10 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
 
+          ## Local Chart COnfig Defaults
+          CHART_KUBE_LINTER_CONFIG="${CHART%/}/${KUBE_LINTER_CONFIG:-.kube-linter.yaml}"
+          echo "${CHART_KUBE_LINTER_CONFIG}"
+
           ## Lookup Release Configuration
           c_config="${CHART%/}/${CONFIG_NAME}"
           echo -e "--- Configuration lookup ($c_config)"
@@ -168,26 +172,24 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             else
               echo -e "--- Kube-Linter Enabled"
               EXTRA_ARGS=""
-              if [ -z "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
-                if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
-                  EXTRA_ARGS="--config ${INPUT_KUBELINTERDEFAULTCONFIG}"
-                  echo -e "--- Using Chart Kube-Linter Config (${INPUT_KUBELINTERDEFAULTCONFIG})"
-                else
-                  echo -e "\e[33m--- Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG}).\e[0m";
-                fi
+              if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
+                EXTRA_ARGS="--config ${INPUT_KUBELINTERDEFAULTCONFIG}"
+                echo -e "--- Using Chart Kube-Linter Config (${INPUT_KUBELINTERDEFAULTCONFIG})"
+              else
+                echo -e "\e[33m--- Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG}).\e[0m";
               fi
-              if [ -z "${KUBE_LINTER_CONFIG}" ]; then
-                if [ -f "${CHART%/}/${KUBE_LINTER_CONFIG}" ]; then
-                  if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
-                    echo -e "--- Merge with Global Kube-Linter configuration"
-                    spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART%/}/${KUBE_LINTER_CONFIG} > ${CHART%/}/${KUBE_LINTER_CONFIG}
-                    cat ${CHART%/}/${KUBE_LINTER_CONFIG}
-                  fi
-                  EXTRA_ARGS="--config ${CHART%/}/${LINTER_CONFIG}"
-                  echo -e "--- Using Chart Kube-Linter Config (${CHART%/}/${LINTER_CONFIG}). Overwrites Global Configuration."
-                else
-                  echo -e "\e[33m--- Chart Kube-Linter Config not found (${CHART%/}/${LINTER_CONFIG}).\e[0m";
+
+
+              if [ -f "${CHART_KUBE_LINTER_CONFIG}" ]; then
+                if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
+                  echo -e "--- Merge with Global Kube-Linter configuration"
+                  spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > ${CHART_KUBE_LINTER_CONFIG}
+                  cat ${CHART_KUBE_LINTER_CONFIG}
                 fi
+                EXTRA_ARGS="--config ${CHART%/}/${LINTER_CONFIG}"
+                echo -e "--- Using Chart Kube-Linter Config (${CHART_KUBE_LINTER_CONFIG}). Overwrites Global Configuration."
+              else
+                echo -e "\e[33m--- Chart Kube-Linter Config not found (${CHART_KUBE_LINTER_CONFIG}).\e[0m";
               fi
 
               echo -e "--- Kube-Linter linting\n"
