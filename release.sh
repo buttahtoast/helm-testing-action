@@ -22,10 +22,23 @@ breakChart() {
   break;
 }
 
-
-## Install Helm Plugins
+## Function: log()
+## Logs normal output
 ##
-helm plugin install https://github.com/karuppiah7890/helm-schema-gen
+log() {
+  $COLOR="${2:-$NONE}"
+  echo -e "$COLOR--- ${1}$NONE"
+}
+
+
+
+
+## Colors
+## Different Colors Codes
+NONE="\e[0m"
+RED="\e[91m"
+GREEN="\e[32m"
+YLW="\e[33m"
 
 ## Chart Configuration
 ##
@@ -95,6 +108,14 @@ CR_RELEASE_LOCATION=".cr-release-packages"
 DRY_RUN=${INPUT_DRYRUN}
 
 
+## Install Helm Plugins
+##
+helm plugin install https://github.com/karuppiah7890/helm-schema-gen
+
+
+
+
+
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
 ##
@@ -160,32 +181,32 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
           ## Lookup Release Configuration
           c_config="${CHART%/}/${CONFIG_NAME}"
-          echo -e "--- Configuration lookup ($c_config)"
+          log "Configuration lookup ($c_config)"
           if [ -f "$c_config" ]; then
-             echo -e "--- Found Configuration"
+             log "Found Configuration"
              # shellcheck source=/dev/null
              source "$c_config"
           fi
 
           ## Filter disabled Charts
           if [[ "${DISABLE,,}" == "true" ]]; then
-            echo -e "--- Chart Disabled"
+            log "Chart Disabled"
           else
 
             ##
             ## Kube Linter
             ##
-
+            log "Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG})" "${RED}"
             if [[ "${KUBE_LINTER_DISABLE,,}" == "true" || "${INPUT_KUBELINTERDISABLE,,}" == "true" ]]; then
-              echo -e "--- Kube-Linter Disabled"
+              log "Kube-Linter Disabled"
             else
-              echo -e "--- Kube-Linter Enabled"
+              log "Kube-Linter Enabled"
               EXTRA_ARGS=""
               if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
                 EXTRA_ARGS="--config ${INPUT_KUBELINTERDEFAULTCONFIG}"
-                echo -e "--- Using Global Kube-Linter Config (${INPUT_KUBELINTERDEFAULTCONFIG})"
+                log "Using Global Kube-Linter Config (${INPUT_KUBELINTERDEFAULTCONFIG})"
               else
-                echo -e "\e[33m--- Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG}).\e[0m";
+                log "Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG})" "${RED}"
               fi
 
 
