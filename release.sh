@@ -14,6 +14,15 @@ createDirs() {
   rm -rf .cr-index && mkdir -p .cr-index ## Recreates Index File
 }
 
+## Function: breakChart()
+## Chart testing was interrupted/broken
+##
+breakChart() {
+  echo -e "\e[91mFound problems when packaging ${1}. ${1} will be skipped for further checks."
+  break;
+}
+
+
 ## Install Helm Plugins
 ##
 helm plugin install https://github.com/karuppiah7890/helm-schema-gen
@@ -84,8 +93,6 @@ CR_RELEASE_LOCATION=".cr-release-packages"
 ## Dry Run Mode
 ##
 DRY_RUN=${INPUT_DRYRUN}
-CHART_KUBE_LINTER_CONFIG="${INPUT_CHARTROOT:-.kube-linter.yaml}"
-env
 
 
 ## Git Tag Fetching
@@ -150,7 +157,6 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
           ## Local Chart COnfig Defaults
           CHART_KUBE_LINTER_CONFIG="${CHART%/}/${KUBE_LINTER_CONFIG:-.kube-linter.yaml}"
-          echo "${CHART_KUBE_LINTER_CONFIG}"
 
           ## Lookup Release Configuration
           c_config="${CHART%/}/${CONFIG_NAME}"
@@ -209,7 +215,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                 if [ -n "$KUBE_LINTER_ALLOW_FAIL" ]; then
                   CHARTS_ERR+=("${CHART}");
                   echo -e "\n\e[91m--- Chart linting failed![0m\n";
-                  break;
+                  breakChart "${CHART}"
                 else
                   echo -e "\e[33m--- Chart linting allowed to fail!\e[0m";
                 fi
