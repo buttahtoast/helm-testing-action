@@ -18,7 +18,7 @@ createDirs() {
 ## Chart testing was interrupted/broken
 ##
 breakChart() {
-  echo -e "\e[91mFound problems when packaging ${1}. ${1} will be skipped for further checks."
+  echo -e "${RED}Found problems when packaging ${1}. ${1} will be skipped for further checks${NONE}"
   break;
 }
 
@@ -27,6 +27,7 @@ breakChart() {
 ##
 log() {
   $COLOR="${2:-$NONE}"
+  echo "${COLOR}"
   echo -e "$COLOR--- ${1}$NONE"
 }
 
