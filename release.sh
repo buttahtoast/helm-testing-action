@@ -186,14 +186,20 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               if [ -f "${CHART_KUBE_LINTER_CONFIG}" ]; then
                 if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
                   echo -e "--- Merge with Global Kube-Linter configuration"
-                  spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > ${CHART_KUBE_LINTER_CONFIG}
-                  cat ${CHART_KUBE_LINTER_CONFIG}
+                  if spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > "${CHART%/}/merged-kube-linter"; then
+                    EXTRA_ARGS="--config ${CHART%/}/merged-kube-linter"
+                  else
+                    echo "Merge FAILED"
+                  fi
+                else
+                  EXTRA_ARGS="--config ${CHART_KUBE_LINTER_CONFIG}"
+                  echo -e "--- Using Chart Kube-Linter Config (${CHART_KUBE_LINTER_CONFIG})."
                 fi
-                EXTRA_ARGS="--config ${CHART_KUBE_LINTER_CONFIG}"
-                echo -e "--- Using Chart Kube-Linter Config (${CHART_KUBE_LINTER_CONFIG}). Overwrites Global Configuration."
               else
                 echo -e "\e[33m--- Chart Kube-Linter Config not found (${CHART_KUBE_LINTER_CONFIG}).\e[0m";
               fi
+
+              echo "${EXTRA_ARGS}"
 
               echo -e "--- Kube-Linter linting\n"
               if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
