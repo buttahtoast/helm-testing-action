@@ -21,7 +21,7 @@ helm plugin install https://github.com/karuppiah7890/helm-schema-gen
 ## Chart Configuration
 ##
 CONFIG_NAME=${INPUT_CHARTCONFIG:-".chart-config"}
-CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "LINTER_DISABLE" "LINTER_CONFIG" )
+CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "KUBE_LINTER_DISABLE" "KUBE_LINTER_CONFIG" )
 
 ## Environment Variables
 ## CR Configuration Variables (Required)
@@ -147,6 +147,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       echo -e "\n\e[33m- Crafting Packages\e[0m"
       for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
+          pwd
 
           ## Lookup Release Configuration
           c_config="${CHART%/}/${CONFIG_NAME}"
@@ -163,17 +164,25 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           else
 
             ## Kube Linter
-            if [[ "${LINTER_DISABLE,,}" == "true" || "${INPUT_KUBELINTERDISABLE,,}" == "true" ]]; then
+            if [[ "${KUBE_LINTER_DISABLE,,}" == "true" || "${INPUT_KUBELINTERDISABLE,,}" == "true" ]]; then
               echo -e "--- Kube-Linter Disabled"
             else
               echo -e "--- Kube-Linter Enabled"
               EXTRA_ARGS=""
-              if [ -z "${LINTER_CONFIG}" ]; then
-                if [ -f "${CHART%/}/${LINTER_CONFIG}" ]; then
-                  EXTRA_ARGS="--config ${CHART%/}/${LINTER_CONFIG}"
-                  echo -e "--- Using Kube-Linter Config (${CHART%/}/${LINTER_CONFIG})"
+              if [ -z "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
+                if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
+                  EXTRA_ARGS="--config ${INPUT_KUBELINTERDEFAULTCONFIG}"
+                  echo -e "--- Using Chart Kube-Linter Config (${INPUT_KUBELINTERDEFAULTCONFIG})"
                 else
-                  echo -e "\e[33m--- Kube-Linter Config not found (${CHART%/}/${LINTER_CONFIG}).\e[0m";
+                  echo -e "\e[33m--- Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG}).\e[0m";
+                fi
+              fi
+              if [ -z "${KUBE_LINTER_CONFIG}" ]; then
+                if [ -f "${CHART%/}/${KUBE_LINTER_CONFIG}" ]; then
+                  EXTRA_ARGS="--config ${CHART%/}/${LINTER_CONFIG}"
+                  echo -e "--- Using Chart Kube-Linter Config (${CHART%/}/${LINTER_CONFIG}). Overwrites Global Configuration."
+                else
+                  echo -e "\e[33m--- Chart Kube-Linter Config not found (${CHART%/}/${LINTER_CONFIG}).\e[0m";
                 fi
               fi
               echo -e "--- Kube-Linter linting\n"
