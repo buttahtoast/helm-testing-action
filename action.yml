@@ -66,12 +66,12 @@ inputs:
 
   ## Configuration Kube Linter
   ##
-  linter-disable:
+  kubeLinterDisable:
     required: false
 
   ## Configuration Kube Linter
   ## Define a default Configuration used for all charts, if none defined.
-  linter-default-config:
+  kubeLinterDefaultConfig:
     required: false
 
 
