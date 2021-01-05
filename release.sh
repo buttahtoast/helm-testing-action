@@ -217,7 +217,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                     EXTRA_ARGS="--config ${CHART%/}/merged-kube-linter"
                   else
                     CHARTS_ERR+=("${CHART}");
-                    break;
+                    breakChart "${CHART}"
                   fi
                 else
                   EXTRA_ARGS="--config ${CHART_KUBE_LINTER_CONFIG}"
