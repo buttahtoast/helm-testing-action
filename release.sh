@@ -179,17 +179,12 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                 echo -e "\e[33m--- Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG}).\e[0m";
               fi
 
-              cat "${INPUT_KUBELINTERDEFAULTCONFIG}"
-              ls -lah
-
-              cat "${CHART_KUBE_LINTER_CONFIG}"
-
 
               if [ -f "${CHART_KUBE_LINTER_CONFIG}" ]; then
                 if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
                   echo -e "--- Merge with Global Kube-Linter configuration"
-                  spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > ${CHART_KUBE_LINTER_CONFIG}
-                  cat ${CHART_KUBE_LINTER_CONFIG}
+                  spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > out
+                  cat out
                 fi
                 EXTRA_ARGS="--config ${CHART%/}/${LINTER_CONFIG}"
                 echo -e "--- Using Chart Kube-Linter Config (${CHART_KUBE_LINTER_CONFIG}). Overwrites Global Configuration."
