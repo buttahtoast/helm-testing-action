@@ -190,6 +190,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                     EXTRA_ARGS="--config ${CHART%/}/merged-kube-linter"
                   else
                     CHARTS_ERR+=("${CHART}");
+                    break;
                   fi
                 else
                   EXTRA_ARGS="--config ${CHART_KUBE_LINTER_CONFIG}"
@@ -208,6 +209,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                 if [ -n "$KUBE_LINTER_ALLOW_FAIL" ]; then
                   CHARTS_ERR+=("${CHART}");
                   echo -e "\n\e[91m--- Chart linting failed![0m\n";
+                  break;
                 else
                   echo -e "\e[33m--- Chart linting allowed to fail!\e[0m";
                 fi
@@ -263,8 +265,8 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       if [ ${#CHARTS_ERR[@]} -eq 0 ]; then
         echo -e "-- No Chart contained errors"
       else
-        echo "Errors found with charts (Check above output)"
-        echo -e "\e[91m----------------------------\e[0m\n"
+        echo -e "\e[91mErrors found with charts (Check above output)"
+        echo -e "----------------------------\e[0m"
         printf '* %s  \n' "${CHARTS_ERR[@]}"
         echo -e "\e[91m---------------------------\e[0m\n"
         if [ -z "${INPUT_FORCE}" ]; then
