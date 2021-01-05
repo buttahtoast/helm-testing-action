@@ -163,13 +163,13 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           else
 
             ## Kube Linter
-            if [[ "${LINTER_DISABLE,,}" == "true" ]]; then
+            if [[ "${LINTER_DISABLE,,}" == "true" || "${INPUT_LINTER\-DISABLE,,}" == "true" ]]; then
               echo -e "--- Kube-Linter Disabled"
             else
               echo -e "--- Kube-Linter Enabled"
               EXTRA_ARGS=""
               if [ -z "${LINTER_CONFIG}" ]; then
-                if [ -f "${CHART%/}/${LINTER_CONFIG}"]; then
+                if [ -f "${CHART%/}/${LINTER_CONFIG}" ]; then
                   EXTRA_ARGS="--config ${CHART%/}/${LINTER_CONFIG}"
                   echo -e "--- Using Kube-Linter Config (${CHART%/}/${LINTER_CONFIG})"
                 else
