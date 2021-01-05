@@ -64,6 +64,13 @@ inputs:
     description: 'Force publishing even if charts had errors (publish charts without error)'
     required: false
 
+  ## Configuration Schema Generator
+  ## Disable Global Schema Generator Usage
+  schemaDisable:
+    required: false
+    description: 'Disable Global Schema Generator Usage'
+    default: "false"
+
   ## Configuration Kube Linter
   ## Disable Global Kube-Linter Usage
   kubeLinterDisable:

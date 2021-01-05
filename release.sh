@@ -26,7 +26,9 @@ breakChart() {
 ## Logs normal output
 ##
 log() {
-  echo -e "$GREEN -- ${1}$NONE"
+  COLOR=""
+  [ -z "${2}" ] && COLOR="${NONE}"
+  echo -e "$NONE -- ${1}$NONE"
 }
 
 
@@ -34,10 +36,12 @@ log() {
 
 ## Colors
 ## Different Colors Codes
-NONE="\e[0m"
-RED="\e[91m"
-GREEN="\e[32m"
-YLW="\e[33m"
+NONE='\033[0m'
+YELO='\033[1;33m'
+BLUE='\033[1;34m'
+RED='\033[1;31m'
+GREEN='\033[1;31m'
+
 
 ## Chart Configuration
 ##
@@ -109,10 +113,8 @@ DRY_RUN=${INPUT_DRYRUN}
 
 ## Install Helm Plugins
 ##
-helm plugin install https://github.com/karuppiah7890/helm-schema-gen
-! [ "${INPUT_UNITTESTDISABLE,,}" == "true"] && helm plugin install https://github.com/quintush/helm-unittest
-
-
+! [ "${INPUT_SCHEMADISABLE,,}" == "true" ] && helm plugin install https://github.com/karuppiah7890/helm-schema-gen > /dev/null 2>&1
+! [ "${INPUT_UNITTESTDISABLE,,}" == "true" ] && helm plugin install https://github.com/quintush/helm-unittest > /dev/null 2>&1
 
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
