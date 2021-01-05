@@ -65,15 +65,25 @@ inputs:
     required: false
 
   ## Configuration Kube Linter
-  ##
+  ## Disable Global Kube-Linter Usage
   kubeLinterDisable:
     required: false
+    description: 'Disable Global Kube-Linter Usage'
+    default: "false"
 
   ## Configuration Kube Linter
   ## Define a default Configuration used for all charts, if none defined.
   kubeLinterDefaultConfig:
     required: false
+    description: 'Default Global Kube-Linter Configuration'
     default: './.kube-linter.yaml'
+
+  ## Configuration Helm Unit Test
+  ## Disable Global Helm Unit Testing Usage
+  unitTestDisable:
+    required: false
+    description: 'Disable Global Helm Unit Testing Usage'
+    default: "false"
 
 
 runs:

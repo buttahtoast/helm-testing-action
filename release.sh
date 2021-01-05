@@ -26,10 +26,7 @@ breakChart() {
 ## Logs normal output
 ##
 log() {
-  $COLOR="${2}"
-  [ -z "$COLOR" ] && COLOR="${NONE}"
-  echo "t ${COLOR}"
-  echo -e "$COLOR--- ${1}$NONE"
+  echo -e "$GREEN -- ${1}$NONE"
 }
 
 
@@ -113,8 +110,7 @@ DRY_RUN=${INPUT_DRYRUN}
 ## Install Helm Plugins
 ##
 helm plugin install https://github.com/karuppiah7890/helm-schema-gen
-
-
+! [ "${INPUT_UNITTESTDISABLE,,}" == "true"] && helm plugin install https://github.com/quintush/helm-unittest
 
 
 
@@ -178,7 +174,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
 
-          ## Local Chart COnfig Defaults
+          ## Local Chart Config Defaults
           CHART_KUBE_LINTER_CONFIG="${CHART%/}/${KUBE_LINTER_CONFIG:-.kube-linter.yaml}"
 
           ## Lookup Release Configuration

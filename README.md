@@ -38,6 +38,18 @@ Certain configurations are required on chart basis. With the following variables
 | `SCHEMA_VALUES` | Define the location of the values file within the chart directory, which is used to generate the values schema. | `values.yaml` |
 | `SCHEMA_FORCE` | If there is already a `values.schema.json` file present in the chart directory, no schema will be generated. This option forces to generate the schema and overwrite present schema files. | `true`/`false` |
 
+
+KUBE_LINTER_DISABLE
+KUBE_LINTER_CONFIG
+KUBE_LINTER_ALLOW_FAIL
+
+
+
+
+
+
+
+
 ### Examples
 
 Disable a chart (Won't create a new release)
