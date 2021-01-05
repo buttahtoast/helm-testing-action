@@ -18,8 +18,8 @@ createDirs() {
 ## Chart testing was interrupted/broken
 ##
 breakChart() {
-  echo -e "${RED}Found problems when packaging ${1}. ${1} will be skipped for further checks${NONE}"
-  break;
+  CHARTS_ERR+=("${1}");
+  log "Found problems when packaging ${1}. ${1} will be skipped for further checks" "${RED}"
 }
 
 ## Function: log()
@@ -30,9 +30,6 @@ log() {
   [ -z "${2}" ] && COLOR="${NONE}" || COLOR="${2}"
   echo -e "$COLOR--- ${1}$NONE"
 }
-
-
-
 
 ## Colors
 ## Different Colors Codes
@@ -165,16 +162,16 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## Verify gh-pages branch
       ##
       if ! git show-ref -q remotes/origin/gh-pages; then
-          echo -e "\n\e[91mMissing gh-pages branch, please initialize the branch.\e[0m\n"; exit 1;
+          echo -e "\n${RED}Missing gh-pages branch, please initialize the branch${NONE}"; exit 1;
       fi
 
       ## Starting iteration for each chart to be packaged
       ## with the helm built-in function.
       ##
       CHARTS_ERR=()
-      echo -e "\n\e[33m- Crafting Packages\e[0m"
+      echo -e "${GREEN}- Crafting Packages${NONE}"
       for CHART in "${EXISTING_CHARTS[@]}"; do
-          echo -e "\n\e[32m-- Package: $CHART\e[0m"
+          echo -e "${YLW}-- Package: $CHART${NONE}m"
 
           ## Local Chart Config Defaults
           CHART_KUBE_LINTER_CONFIG="${CHART%/}/${KUBE_LINTER_CONFIG:-.kube-linter.yaml}"
@@ -196,7 +193,6 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             ##
             ## Kube Linter
             ##
-            log "Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG})" "${RED}"
             if [[ "${KUBE_LINTER_DISABLE,,}" == "true" || "${INPUT_KUBELINTERDISABLE,,}" == "true" ]]; then
               log "Kube-Linter Disabled"
             else
@@ -212,33 +208,29 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
               if [ -f "${CHART_KUBE_LINTER_CONFIG}" ]; then
                 if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
-                  echo -e "--- Merge with Global Kube-Linter configuration"
+                  log "Merge with Global Kube-Linter configuration"
                   if spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > "${CHART%/}/merged-kube-linter"; then
                     EXTRA_ARGS="--config ${CHART%/}/merged-kube-linter"
                   else
-                    CHARTS_ERR+=("${CHART}");
-                    breakChart "${CHART}"
+                    breakChart "${CHART}" && break;
                   fi
                 else
                   EXTRA_ARGS="--config ${CHART_KUBE_LINTER_CONFIG}"
-                  echo -e "--- Using Chart Kube-Linter Config (${CHART_KUBE_LINTER_CONFIG})."
+                  log "Using Chart Kube-Linter Config (${CHART_KUBE_LINTER_CONFIG})"
                 fi
               else
-                echo -e "\e[33m--- Chart Kube-Linter Config not found (${CHART_KUBE_LINTER_CONFIG}).\e[0m";
+                log "Chart Kube-Linter Config not found (${CHART_KUBE_LINTER_CONFIG})";
               fi
 
-              echo "${EXTRA_ARGS}"
-
-              echo -e "--- Kube-Linter linting\n"
+              log "Kube-Linter linting\n"
               if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
-                echo -e "--- Kube-Linter Succeded\n"
+                log "Kube-Linter Succeded\n"
               else
                 if [ -n "$KUBE_LINTER_ALLOW_FAIL" ]; then
-                  CHARTS_ERR+=("${CHART}");
-                  echo -e "\n\e[91m--- Chart linting failed![0m\n";
-                  breakChart "${CHART}"
+                  log "Chart linting failed!" "${RED}"
+                  breakChart "${CHART}" && break;
                 else
-                  echo -e "\e[33m--- Chart linting allowed to fail!\e[0m";
+                  log "Chart linting allowed to fail!" "${YLW}"
                 fi
               fi
             fi
@@ -255,18 +247,24 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             ## Chart Schema Generator
             SCHEMA_PATH="${CHART%/}/values.schema.json"
             if [[ "${SCHEMA_GENERATE,,}" == "true" ]]; then
-              echo -e "--- Attempt to generate Values Schema"
+              log "Attempt to generate Values Schema"
               if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
-                echo -e "--- Generating Values Schema"
-                if ! helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"; then
-                   echo -e "\n\e[91m--- Generating Schema failed![0m\n";
-                   CHARTS_ERR+=("${CHART}");
+                log "Generating Values Schema"
+                if helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"; then
+                  log "Generating Values Schema Succeded\n"
+                else
+                  if [ -n "SCHEMA_ALLOW_FAIL" ]; then
+                   log "Generating Values Schema failed!" "${RED}"
+                   breakChart "${CHART}" && break;
+                  else
+                   log "Generating Values Schema allowed to fail!" "${YLW}"
+                  fi
                 fi
               else
-                echo -e "--- Skipping Values Schema"
+                log "Skipping Values Schema"
               fi
             else
-             echo -e "--- Values Schema Disabled"
+              log "Values Schema Disabled"
             fi
 
             if [ -z "$DRY_RUN" ]; then
