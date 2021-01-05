@@ -147,7 +147,6 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       echo -e "\n\e[33m- Crafting Packages\e[0m"
       for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "\n\e[32m-- Package: $CHART\e[0m"
-          pwd
 
           ## Lookup Release Configuration
           c_config="${CHART%/}/${CONFIG_NAME}"
@@ -179,12 +178,18 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               fi
               if [ -z "${KUBE_LINTER_CONFIG}" ]; then
                 if [ -f "${CHART%/}/${KUBE_LINTER_CONFIG}" ]; then
+                  if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
+                    echo -e "--- Merge with Global Kube-Linter configuration"
+                    spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART%/}/${KUBE_LINTER_CONFIG} > ${CHART%/}/${KUBE_LINTER_CONFIG}
+                    cat ${CHART%/}/${KUBE_LINTER_CONFIG}
+                  fi
                   EXTRA_ARGS="--config ${CHART%/}/${LINTER_CONFIG}"
                   echo -e "--- Using Chart Kube-Linter Config (${CHART%/}/${LINTER_CONFIG}). Overwrites Global Configuration."
                 else
                   echo -e "\e[33m--- Chart Kube-Linter Config not found (${CHART%/}/${LINTER_CONFIG}).\e[0m";
                 fi
               fi
+
               echo -e "--- Kube-Linter linting\n"
               if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
                 echo -e "--- Kube-Linter Succeded\n"
@@ -218,7 +223,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                CHARTS_ERR+=("${CHART}");
              fi
             else
-             echo -e "--- Dry Run..."
+              echo -e "--- Dry Run..."
             fi
           fi
 

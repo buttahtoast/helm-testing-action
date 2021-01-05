@@ -73,6 +73,7 @@ inputs:
   ## Define a default Configuration used for all charts, if none defined.
   kubeLinterDefaultConfig:
     required: false
+    default: './kube-linter.yaml'
 
 
 runs:

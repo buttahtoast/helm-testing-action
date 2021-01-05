@@ -20,7 +20,9 @@ RUN apk add --no-cache ca-certificates curl bash git openssl jq && \
   mv ./cr /usr/local/bin/ && \
   curl -sL "https://github.com/stackrox/kube-linter/releases/download/$(curl --silent "https://api.github.com/repos/stackrox/kube-linter/releases/latest" | jq -r .tag_name)/kube-linter-linux.tar.gz" | tar xz && \
   chmod +x ./kube-linter && \
-  mv ./kube-linter /usr/local/bin/
+  mv ./kube-linter /usr/local/bin/ && \
+  curl -s -L -o /usr/local/bin/spruce https://github.com/geofffranks/spruce/releases/download/$(curl --silent "https://api.github.com/repos/geofffranks/spruce/releases/latest" | jq -r .tag_name)/spruce-linux-amd64 && \
+  chmod +x /usr/local/bin/spruce
 
 ## Execute Action Handler
 ##
