@@ -43,7 +43,7 @@ GREEN='\033[1;32m'
 ## Chart Configuration
 ##
 CONFIG_NAME=${INPUT_CHARTCONFIG:-".chart-config"}
-CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "KUBE_LINTER_DISABLE" "KUBE_LINTER_CONFIG" "KUBE_LINTER_ALLOW_FAIL" )
+CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "KUBE_LINTER_DISABLE" "KUBE_LINTER_CONFIG" "KUBE_LINTER_ALLOW_FAIL" "UNIT_TEST_DISABLE" "UNIT_TEST_ALLOW_FAIL")
 
 ## Environment Variables
 ## CR Configuration Variables (Required)
@@ -221,7 +221,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                 log "Chart Kube-Linter Config not found (${CHART_KUBE_LINTER_CONFIG})";
               fi
 
-              log "Kube-Linter linting\n"
+              log "Kube-Linter linting" "${YLW}"
               if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
                 log "Kube-Linter Succeded\n"
               else
@@ -237,10 +237,11 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             ##
             ## Helm Unit Tests
             ##
-            helm unittest -s3 
-
-
-
+            if [[ "${UNIT_TEST_DISABLE,,}" == "true" || "${INPUT_UNITTESTDISABLE,,}" == "true" ]]; then
+              log "Kube-Linter Disabled"
+            else
+              helm unittest --color -3 "${CHART}"
+            fi
 
 
 
@@ -253,11 +254,11 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                 if helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"; then
                   log "Generating Values Schema Succeded\n"
                 else
-                  if [ -n "SCHEMA_ALLOW_FAIL" ]; then
-                   log "Generating Values Schema failed!" "${RED}"
-                   breakChart "${CHART}" && break;
+                  if [[ "${SCHEMA_ALLOW_FAIL,,}" == "true" ]] || [[ "${INPUT_SCHEMAALLOWFAILURE,,}" == "true" ]]; then
+                    log "Generating Values Schema allowed to fail!" "${YLW}"
                   else
-                   log "Generating Values Schema allowed to fail!" "${YLW}"
+                    log "Generating Values Schema failed!" "${RED}"
+                    breakChart "${CHART}" && break;
                   fi
                 fi
               else
@@ -267,14 +268,16 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               log "Values Schema Disabled"
             fi
 
+            log "Creating Helm Package"
             if [ -z "$DRY_RUN" ]; then
-             echo -e "--- Creating Helm Package"
-             if ! helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
-               echo -e "\n\e[91m--- Generating Package failed![0m\n";
+             if helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
+               log "Generate Package" "${GREEN}"
+             else
+               log "Generating Package failed!" "${RED}"
                CHARTS_ERR+=("${CHART}");
              fi
             else
-              echo -e "--- Dry Run..."
+              log "Dry Run..."
             fi
           fi
 

@@ -56,12 +56,14 @@ inputs:
   ##
   dryrun:
     description: 'Run Publishing Action without publishing charts'
+    default: "false"
     required: false
 
   ## Configuration for Force
   ##
   force:
     description: 'Force publishing even if charts had errors (publish charts without error)'
+    default: "false"
     required: false
 
   ## Configuration Schema Generator
@@ -69,6 +71,13 @@ inputs:
   schemaDisable:
     required: false
     description: 'Disable Global Schema Generator Usage'
+    default: "false"
+
+  ## Configuration Schema Generator
+  ## Allows Schema Generator Jobs to fail (Global)
+  schemaAllowFailure:
+    required: false
+    description: 'Allows Schema Generator Jobs to fail (Global)'
     default: "false"
 
   ## Configuration Kube Linter
@@ -98,6 +107,13 @@ inputs:
   unitTestDisable:
     required: false
     description: 'Disable Global Helm Unit Testing Usage'
+    default: "false"
+
+  ## Configuration Helm Unit Test
+  ## Allows Helm Unit Test Jobs to fail (Global)
+  unitTestAllowFailure:
+    required: false
+    description: 'Allows Helm Unit Test Jobs to fail (Global)'
     default: "false"
 
 

@@ -1,6 +1,6 @@
 # Helm Chart Publish
 
-This Github action allows you to publish a helm repository via Github Pages. It adds an improved Bash wrapper on top of the [Helm Chart Releaser](https://github.com/helm/chart-releaser-action). The main benefit of this wrapper  is currently, that each chart is checked if it has changes in it's `Chart.yaml` file. If not, no new release will be made. The script will create for each chart a GitHub release through Chart Releaser. The index.yaml will be updated on the `gh-pages` branch.
+This Github action allows you to publish a helm repository via Github Pages. It integrates [Kube-Linter](https://github.com/stackrox/kube-linter), [Helm Values Generator](https://github.com/karuppiah7890/helm-schema-gen) and [Helm Unit Testing](https://github.com/quintush/helm-unittest) as tools, to improve the quality of your published helm charts. It adds an improved Bash wrapper on top of the [Helm Chart Releaser](https://github.com/helm/chart-releaser-action). The main benefit of this wrapper  is currently, that each chart is checked if it has changes in it's `Chart.yaml` file. If not, no new release will be made. The script will create for each chart a GitHub release through Chart Releaser. The index.yaml will be updated on the `gh-pages` branch.
 
 
 ## Setup
@@ -26,6 +26,18 @@ Here is a list which variables can be given/used by the script. Some values can 
 | - | Define the project, which will be updated. By default the current running project is used.  | `$CR_GIT_REPO` | `$(cut -d '/' -f 2 <<< $GITHUB_REPOSITORY)` |
 | `user` | Define the user name used for commits (pages update). | `$GIT_USER` | `$GITHUB_ACTOR` |
 | `email` | Define the user email used for commits (pages update). | `$GIT_EMAIL` | `$GITHUB_ACTOR@users.noreply.github.com` |
+| `dryrun` | Run Publishing Action without publishing charts. | `-` | `false` |
+| `force` | Force publishing even if charts had errors (publish only charts without error) | `-` | `false` |
+| `schemaDisable` | Disable Global [Helm Values Generator](https://github.com/karuppiah7890/helm-schema-gen) Usage. No chart can use this feature. | `-` | `false` |
+| `schemaAllowFailure` | Global Schema Generator Configuration. If a Schema Generator fails, the chart will not be marked as error and therefor might be released. This parameters allows this behavior for all charts. | `-` | `false` |
+| `kubeLinterDisable` | Disable Global [Kube-Linter](https://github.com/stackrox/kube-linter) Usage. No chart can use this feature. | `-` | `false` |
+| `kubeLinterDefaultConfig` | Global Kube-Linter Configuration. With this parameter you can define the location for your global Kube-Linter configuration. Meaning this configuration will be used for each chart (if possible). The path is relative to the root folder of the repository. | `-` | `./.kube-linter.yaml` |
+| `kubeLinterAllowFailure` | Global Kube-Linter Configuration. If a Kube-linting fails, the chart will not be marked as error and therefor might be released. This parameters allows this behavior for all charts. | `-` | `false` |
+
+
+
+| `email` | Define the user email used for commits (pages update). | `$GIT_EMAIL` | `$GITHUB_ACTOR@users.noreply.github.com` |
+
 
 ## Chart Configuration
 
@@ -36,12 +48,15 @@ Certain configurations are required on chart basis. With the following variables
 | `DISABLE` | Disables the chart during the release process. | `true`/`false` |
 | `SCHEMA_GENERATE` | Generates Schema with [helm-schema-gen](https://github.com/karuppiah7890/helm-schema-gen) if no values.schema.json file exists. | `true`/`false` |
 | `SCHEMA_VALUES` | Define the location of the values file within the chart directory, which is used to generate the values schema. | `values.yaml` |
-| `SCHEMA_FORCE` | If there is already a `values.schema.json` file present in the chart directory, no schema will be generated. This option forces to generate the schema and overwrite present schema files. | `true`/`false` |
+| `SCHEMA_FORCE` | If there is already a `values.schema.json` file present in the chart directory, no schema will be generated. This option forces to generate the schema and overwrite present schema files . | `true`/`false` |
+| `SCHEMA_ALLOW_FAIL` | Allows the failure of the Schema Generator action for this specific chart (if not set globally). | `true`/`false` |
+| `KUBE_LINTER_DISABLE` | Disable Kube-Linter action for this specific chart | `true`/`false` |
+| `KUBE_LINTER_CONFIG` | Define a path to a custom Kube-Linter  configuration Kube-Linter for this chart. The path is relative to the specifics chart subfolder. This configuration will be merged with the global Kube-Linter configuration, if present. See the [Examples](#examples) | `.kube-linter.yaml` |
+| `KUBE_LINTER_ALLOW_FAIL` | Allows the failure of the Kube-Linter action for this specific chart (if not set globally). | `true`/`false` |
 
 
-KUBE_LINTER_DISABLE
-KUBE_LINTER_CONFIG
-KUBE_LINTER_ALLOW_FAIL
+UNIT_TEST_DISABLE
+UNIT_TEST_ALLOW_FAIL
 
 
 
@@ -50,7 +65,9 @@ KUBE_LINTER_ALLOW_FAIL
 
 
 
-### Examples
+
+
+## Examples
 
 Disable a chart (Won't create a new release)
 
@@ -68,6 +85,50 @@ Enable enforced Schema Generation
 SCHEMA_GENERATE=true
 SCHEMA_FORCE=true
 ```
+
+## Using Kube-Linter
+
+Before you start, check out how to create Kube-Linter configurations [here](https://github.com/stackrox/kube-linter/blob/main/docs/configuring-kubelinter.md). The Kube-Linter configurations are merged with [spruce](https://github.com/geofffranks/spruce). This means you can combine per chart Kube-Linter configurations with the global configuration. Let me show you:
+
+**./.kube-linter.yaml** (Global Configuration)
+
+```
+---
+checks:
+  addAllBuiltIn: true
+  execlude:
+    - "default-service-account"
+    - "no-anti-affinity"
+    - "required-annotation-email"
+```
+
+**./charts/mychart/.kube-linter.yaml** (Per Chart Configuration)
+
+```
+---
+checks:
+  execlude:
+    - (( prepend ))
+    - "required-label-owner"
+    - "unset-cpu-requirements"
+    - "unset-memory-requirements"
+```
+
+Results in:
+
+```
+checks:
+  addAllBuiltIn: true
+  execlude:
+  - required-label-owner
+  - unset-cpu-requirements
+  - unset-memory-requirements
+  - default-service-account
+  - no-anti-affinity
+  - required-annotation-email
+```
+
+All [spruce operators](https://github.com/geofffranks/spruce/blob/master/doc/operators.md) are supported.
 
 ## Usage
 
