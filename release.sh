@@ -205,7 +205,6 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                 log "Global Kube-Linter Config not found (${INPUT_KUBELINTERDEFAULTCONFIG})" "${RED}"
               fi
 
-
               if [ -f "${CHART_KUBE_LINTER_CONFIG}" ]; then
                 if [ -f "${INPUT_KUBELINTERDEFAULTCONFIG}" ]; then
                   log "Merge with Global Kube-Linter configuration"
@@ -226,7 +225,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
                 log "Kube-Linter Succeded\n"
               else
-                if [ -n "$KUBE_LINTER_ALLOW_FAIL" ]; then
+                if [[ -n "$KUBE_LINTER_ALLOW_FAIL" ]] || [[ -n "$INPUT_KUBELINTERALLOWFAILURE" ]]; then
                   log "Chart linting failed!" "${RED}"
                   breakChart "${CHART}" && break;
                 else
@@ -238,6 +237,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             ##
             ## Helm Unit Tests
             ##
+            helm unittest -s3 
 
 
 

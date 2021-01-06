@@ -85,6 +85,14 @@ inputs:
     description: 'Default Global Kube-Linter Configuration'
     default: './.kube-linter.yaml'
 
+  ## Configuration Kube Linter
+  ## Allows Kube Linter Jobs to fail (Global)
+  kubeLinterAllowFailure:
+    required: false
+    description: 'Allows Kube Linter Jobs to fail (Global)'
+    default: "false"
+
+
   ## Configuration Helm Unit Test
   ## Disable Global Helm Unit Testing Usage
   unitTestDisable:
