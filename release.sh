@@ -169,9 +169,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## with the helm built-in function.
       ##
       CHARTS_ERR=()
-      echo -e "\n${GREEN}- Crafting Packages${NONE}\n"
+      echo -e "\n${GREEN}- Crafting Packages${NONE}"
       for CHART in "${EXISTING_CHARTS[@]}"; do
-          echo -e "${YLW}-- Package: $CHART${NONE}\n"
+          echo -e "\n${YLW}-- Chart: $CHART${NONE}\n"
 
           ## Local Chart Config Defaults
           CHART_KUBE_LINTER_CONFIG="${CHART%/}/${KUBE_LINTER_CONFIG:-.kube-linter.yaml}"

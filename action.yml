@@ -19,13 +19,6 @@ inputs:
     required: false
     default: './cr.yaml'
 
-  ## Chart Configuration filename
-  ##
-  chartConfig:
-    description: 'Chart Configuration file'
-    required: false
-
-
   ## Configuration for the git username (Release owner)
   ##
   user:
@@ -50,6 +43,13 @@ inputs:
   chartRoot:
     description: 'Charts root directory'
     default: 'charts/'
+    required: false
+
+  ## Chart Configuration filename
+  ##
+  chartConfig:
+    description: 'Chart Configuration file'
+    default: ".chart-config"
     required: false
 
   ## Configuration for Dry Run
