@@ -229,9 +229,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                 log "Chart Kube-Linter Config not found (${CHART_KUBE_LINTER_CONFIG})";
               fi
 
-              log "Kube-Linter linting" "${YLW}"
+              log "Running Kube-Linter" "${YLW}"
               if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
-                log "Kube-Linter Succeded"
+                log "Kube-Linter Succeded" "${GREEN}"
               else
                 if [[ -n "$KUBE_LINTER_ALLOW_FAIL" ]] || [[ -n "$INPUT_KUBELINTERALLOWFAILURE" ]]; then
                   log "Chart linting failed!" "${RED}"
@@ -262,9 +262,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             if [[ "${SCHEMA_GENERATE,,}" == "true" ]]; then
               log "Attempt to generate Values Schema"
               if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
-                log "Generating Values Schema"
+                log "Generating Values Schema" "${YLW}"
                 if helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"; then
-                  log "Generating Values Schema Succeded\n"
+                  log "Generating Values Schema Succeded" "${GREEN}"
                 else
                   if [[ "${SCHEMA_ALLOW_FAIL,,}" == "true" ]] || [[ "${INPUT_SCHEMAALLOWFAILURE,,}" == "true" ]]; then
                     log "Generating Values Schema allowed to fail!" "${YLW}"
