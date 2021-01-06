@@ -43,7 +43,7 @@ GREEN='\033[1;32m'
 ## Chart Configuration
 ##
 CONFIG_NAME=${INPUT_CHARTCONFIG:-".chart-config"}
-CONFIG_SUPPORTED_VALUES=( "DISABLE" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "KUBE_LINTER_DISABLE" "KUBE_LINTER_CONFIG" "KUBE_LINTER_ALLOW_FAIL" "UNIT_TEST_DISABLE" "UNIT_TEST_ALLOW_FAIL")
+CONFIG_SUPPORTED_VALUES=( "DISABLE" "SKIP_PUBLISH" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "KUBE_LINTER_DISABLE" "KUBE_LINTER_CONFIG" "KUBE_LINTER_ALLOW_FAIL" "UNIT_TEST_DISABLE" "UNIT_TEST_ALLOW_FAIL")
 
 ## Environment Variables
 ## CR Configuration Variables (Required)
@@ -282,11 +282,15 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
             log "Creating Helm Package"
             if [ -z "$DRY_RUN" ]; then
-             if helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
-               log "Generate Package" "${GREEN}"
+             if [ "${SKIP_PUBLISH,,}" == "true" ]; then
+               log "Skipping Publish"
              else
-               log "Generating Package failed!" "${RED}"
-               CHARTS_ERR+=("${CHART}");
+               if helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
+                 log "Generate Package" "${GREEN}"
+               else
+                 log "Generating Package failed!" "${RED}"
+                 CHARTS_ERR+=("${CHART}");
+               fi
              fi
             else
               log "Dry Run..."
@@ -294,7 +298,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           fi
 
           ## Unset Configuration Values
-          unset "$(echo ${CONFIG_SUPPORTED_VALUES[*]})"
+          unset $(echo ${CONFIG_SUPPORTED_VALUES[*]})
       done
 
 

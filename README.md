@@ -46,6 +46,7 @@ Certain configurations are required on chart basis. With the following variables
 | Variable | Description | Values |
 | :------- | :---------- | :----- |
 | `DISABLE` | Disables the chart during the release process. | `true`/`false` |
+| `SKIP_PUBLISH` | Executes all checks but does not create a package/publish the chart | `true`/`false` |
 | `SCHEMA_GENERATE` | Generates Schema with [helm-schema-gen](https://github.com/karuppiah7890/helm-schema-gen) if no values.schema.json file exists. | `true`/`false` |
 | `SCHEMA_VALUES` | Define the location of the values file within the chart directory, which is used to generate the values schema. | `values.yaml` |
 | `SCHEMA_FORCE` | If there is already a `values.schema.json` file present in the chart directory, no schema will be generated. This option forces to generate the schema and overwrite present schema files . | `true`/`false` |
@@ -53,6 +54,7 @@ Certain configurations are required on chart basis. With the following variables
 | `KUBE_LINTER_DISABLE` | Disable Kube-Linter action for this specific chart | `true`/`false` |
 | `KUBE_LINTER_CONFIG` | Define a path to a custom Kube-Linter  configuration Kube-Linter for this chart. The path is relative to the specifics chart subfolder. This configuration will be merged with the global Kube-Linter configuration, if present. See the [Examples](#examples) | `.kube-linter.yaml` |
 | `KUBE_LINTER_ALLOW_FAIL` | Allows the failure of the Kube-Linter action for this specific chart (if not set globally). | `true`/`false` |
+
 
 
 UNIT_TEST_DISABLE
