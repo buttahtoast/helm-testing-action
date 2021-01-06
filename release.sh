@@ -119,7 +119,6 @@ DRY_RUN=${INPUT_DRYRUN}
 git fetch --tags
 HEAD_REV=$(git rev-parse --verify HEAD);
 LATEST_TAG_REV=$(git rev-parse --verify "$(latestTag)");
-if [[ "$LATEST_TAG_REV" == "$HEAD_REV" ]]; then echo -e "\n\e[33mNothing to do!\e[0m\n"; exit 0; fi
 
 ## Initialize for each directory a matching regex
 ## which finds changes in the diff statement
@@ -249,13 +248,18 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               log "Helm Unit-Tests Disabled"
             else
               log "Helm Unit-Tests Enabled"
-
-
               log "Running Unit-Tests" "${YLW}"
-              helm unittest --color -3 "${CHART}"
+              if helm unittest --color -3 ${UNIT_TEST_ARGS} "${CHART}"; then
+                log "Unit-Tests Succeded" "${GREEN}"
+              else
+                if [[ "${UNIT_TEST_ALLOW_FAIL,,}" == "true" ]] || [[ "${INPUT_UNITTESTALLOWFAILURE,,}" == "true" ]]; then
+                  log "Unit-Tests allowed to fail!" "${YLW}"
+                else
+                  log "Unit-Tests failed!" "${RED}"
+                  breakChart "${CHART}" && break;
+                fi
+              fi
             fi
-
-
 
             ## Chart Schema Generator
             SCHEMA_PATH="${CHART%/}/values.schema.json"

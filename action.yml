@@ -10,7 +10,7 @@ inputs:
   ##
   token:
     description: 'A personal access token needed to push your site after it has been built.'
-    required: true
+    required: false
 
   ## Configuration fo a Chart Releaser COnfiguration
   ##

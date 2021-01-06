@@ -47,27 +47,16 @@ Certain configurations are required on chart basis. With the following variables
 | :------- | :---------- | :----- |
 | `DISABLE` | Disables the chart during the release process. | `true`/`false` |
 | `SKIP_PUBLISH` | Executes all checks but does not create a package/publish the chart | `true`/`false` |
-| `SCHEMA_GENERATE` | Generates Schema with [helm-schema-gen](https://github.com/karuppiah7890/helm-schema-gen) if no values.schema.json file exists. | `true`/`false` |
+| `SCHEMA_ENABLE` | Generates Schema with [helm-schema-gen](https://github.com/karuppiah7890/helm-schema-gen) if no values.schema.json file exists. | `true`/`false` |
 | `SCHEMA_VALUES` | Define the location of the values file within the chart directory, which is used to generate the values schema. | `values.yaml` |
 | `SCHEMA_FORCE` | If there is already a `values.schema.json` file present in the chart directory, no schema will be generated. This option forces to generate the schema and overwrite present schema files . | `true`/`false` |
 | `SCHEMA_ALLOW_FAIL` | Allows the failure of the Schema Generator action for this specific chart (if not set globally). | `true`/`false` |
-| `KUBE_LINTER_DISABLE` | Disable Kube-Linter action for this specific chart | `true`/`false` |
+| `KUBE_LINTER_DISABLE` | Disable Kube-Linter action for this specific chart (if not disabled globally) | `true`/`false` |
 | `KUBE_LINTER_CONFIG` | Define a path to a custom Kube-Linter  configuration Kube-Linter for this chart. The path is relative to the specifics chart subfolder. This configuration will be merged with the global Kube-Linter configuration, if present. See the [Examples](#examples) | `.kube-linter.yaml` |
 | `KUBE_LINTER_ALLOW_FAIL` | Allows the failure of the Kube-Linter action for this specific chart (if not set globally). | `true`/`false` |
-
-
-
-UNIT_TEST_DISABLE
-UNIT_TEST_ALLOW_FAIL
-
-
-
-
-
-
-
-
-
+| `UNIT_TEST_DISABLE` | Disable Helm Unit-Test action for this specific chart (if not disabled globally) | `true`/`false` |
+| `UNIT_TEST_ARGS` | Additional arguments for `helm unittest` | `-` |
+| `UNIT_TEST_ALLOW_FAIL` | Allows the failure of the Helm Unit-Test action for this specific chart (if not set globally). | `true`/`false` |
 
 ## Examples
 
