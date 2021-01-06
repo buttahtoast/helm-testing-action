@@ -193,7 +193,10 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             ##
             ## Preparation
             ##
-            helm dependency update ${CHART}
+            log "Updating Dependencies"
+            if ! helm dependency update ${CHART}; then
+              log "Encounterd problem updating dependencies. Will continue..." "${RED}"
+            fi
 
             ##
             ## Kube Linter
@@ -228,7 +231,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
               log "Kube-Linter linting" "${YLW}"
               if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
-                log "Kube-Linter Succeded\n"
+                log "Kube-Linter Succeded"
               else
                 if [[ -n "$KUBE_LINTER_ALLOW_FAIL" ]] || [[ -n "$INPUT_KUBELINTERALLOWFAILURE" ]]; then
                   log "Chart linting failed!" "${RED}"
