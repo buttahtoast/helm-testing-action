@@ -191,6 +191,11 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           else
 
             ##
+            ## Preparation
+            ##
+            helm dependency update ${CHART}
+
+            ##
             ## Kube Linter
             ##
             if [[ "${KUBE_LINTER_DISABLE,,}" == "true" || "${INPUT_KUBELINTERDISABLE,,}" == "true" ]]; then
@@ -238,8 +243,12 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             ## Helm Unit Tests
             ##
             if [[ "${UNIT_TEST_DISABLE,,}" == "true" || "${INPUT_UNITTESTDISABLE,,}" == "true" ]]; then
-              log "Kube-Linter Disabled"
+              log "Helm Unit-Tests Disabled"
             else
+              log "Helm Unit-Tests Enabled"
+
+
+              log "Running Unit-Tests" "${YLW}"
               helm unittest --color -3 "${CHART}"
             fi
 
