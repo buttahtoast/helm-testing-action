@@ -33,11 +33,8 @@ Here is a list which variables can be given/used by the script. Some values can 
 | `kubeLinterDisable` | Disable Global [Kube-Linter](https://github.com/stackrox/kube-linter) Usage. No chart can use this feature. | `-` | `false` |
 | `kubeLinterDefaultConfig` | Global Kube-Linter Configuration. With this parameter you can define the location for your global Kube-Linter configuration. Meaning this configuration will be used for each chart (if possible). The path is relative to the root folder of the repository. | `-` | `./.kube-linter.yaml` |
 | `kubeLinterAllowFailure` | Global Kube-Linter Configuration. If a Kube-linting fails, the chart will not be marked as error and therefor might be released. This parameters allows this behavior for all charts. | `-` | `false` |
-
-
-
-| `email` | Define the user email used for commits (pages update). | `$GIT_EMAIL` | `$GITHUB_ACTOR@users.noreply.github.com` |
-
+| `unitTestDisable` | Disable Global [Helm Unit Testing](https://github.com/quintush/helm-unittest) Usage. No chart can use this feature. | `-` | `false` |
+| `unitTestAllowFailure` | Global Helm Unit Test Configuration. If a Helm Unit Test fails, the chart will not be marked as error and therefor might be released. This parameters allows this behavior for all charts. | `-` | `false` |
 
 ## Chart Configuration
 

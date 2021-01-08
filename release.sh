@@ -244,6 +244,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             ##
             ## Helm Unit Tests
             ##
+
             if [[ "${UNIT_TEST_DISABLE,,}" == "true" || "${INPUT_UNITTESTDISABLE,,}" == "true" ]]; then
               log "Helm Unit-Tests Disabled"
             else
@@ -262,9 +263,13 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             fi
 
             ## Chart Schema Generator
+            ${INPUT_SCHEMADISABLE}
+
             SCHEMA_PATH="${CHART%/}/values.schema.json"
-            if [[ "${SCHEMA_GENERATE,,}" == "true" ]]; then
-              log "Attempt to generate Values Schema"
+            if [[ "${SCHEMA_ENABLE,,}" != "true" ]] || [[ "${INPUT_SCHEMADISABLE,,}" == "true" ]]; then
+              log "Helm Schema Generator Disabled"
+            else
+              log "Helm Schema Generator Enabled"
               if ! [ -f "${SCHEMA_PATH}" ] || [[ "${SCHEMA_FORCE,,}" == "true" ]]; then
                 log "Generating Values Schema" "${YLW}"
                 if helm schema-gen "${CHART%/}/${SCHEMA_VALUES:values.yaml}" > "${SCHEMA_PATH}"; then
@@ -305,8 +310,6 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           unset $(echo ${CONFIG_SUPPORTED_VALUES[*]})
       done
 
-
-
       ## Check Chart Errors
       ##
       echo -e "\n\e[33m- Checking for Errors\e[0m\n"
@@ -322,8 +325,6 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           echo -e "-- Forcing Publish";
         fi
       fi
-
-
 
 
       ## For each package made by helm cr will
