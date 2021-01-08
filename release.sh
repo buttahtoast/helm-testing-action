@@ -285,8 +285,6 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               else
                 log "Skipping Values Schema"
               fi
-            else
-              log "Values Schema Disabled"
             fi
 
             log "Creating Helm Package"
