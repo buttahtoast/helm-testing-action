@@ -318,7 +318,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
         echo -e "${RED}----------------------------${NONE}"
         printf ' * %s  \n' "${CHARTS_ERR[@]}"
         echo -e "${RED}----------------------------${NONE}"
-        if [[ "${INPUT_FORCE,,}" != "true" ]]; then
+        if [[ "${INPUT_FORCE,,}" == "true" ]]; then
           log "Forcing Publish"
         else
           exit 1;
