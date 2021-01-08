@@ -38,7 +38,7 @@ YLW='\033[1;33m'
 BLUE='\033[1;34m'
 RED='\033[1;31m'
 GREEN='\033[1;32m'
-PRPLE='\033[1;0;35'
+PRPLE='\033[0;35'
 
 
 ## Chart Configuration
