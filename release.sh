@@ -228,7 +228,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               fi
 
               log "Running Kube-Linter" "${YLW}"
-              if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
+              if kube-linter lint --verbose ${EXTRA_ARGS} ${CHART}; then
                 log "Kube-Linter Succeded" "${GREEN}"
               else
                 if [[ -n "$KUBE_LINTER_ALLOW_FAIL" ]] || [[ -n "$INPUT_KUBELINTERALLOWFAILURE" ]]; then
