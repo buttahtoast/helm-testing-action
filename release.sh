@@ -35,7 +35,6 @@ log() {
 ## Different Colors Codes
 NONE='\033[0m'
 YLW='\033[1;33m'
-BLUE='\033[1;34m'
 RED='\033[1;31m'
 GREEN='\033[1;32m'
 
@@ -43,7 +42,7 @@ GREEN='\033[1;32m'
 ## Chart Configuration
 ##
 CONFIG_NAME=${INPUT_CHARTCONFIG:-".chart-config"}
-CONFIG_SUPPORTED_VALUES=( "DISABLE" "SKIP_PUBLISH" "GENERATE_SCHEMA" "SCHEMA_VALUES" "SCHEMA_FORCE" "KUBE_LINTER_DISABLE" "KUBE_LINTER_CONFIG" "KUBE_LINTER_ALLOW_FAIL" "UNIT_TEST_DISABLE" "UNIT_TEST_ALLOW_FAIL")
+CONFIG_SUPPORTED_VALUES=( "DISABLE" "SKIP_PUBLISH" "SCHEMA_ENABLE" "SCHEMA_VALUES" "SCHEMA_FORCE" "SCHEMA_ALLOW_FAIL" "KUBE_LINTER_DISABLE" "KUBE_LINTER_CONFIG" "KUBE_LINTER_ALLOW_FAIL" "UNIT_TEST_DISABLE" "UNIT_TEST_ARGS" "UNIT_TEST_ALLOW_FAIL")
 
 ## Environment Variables
 ## CR Configuration Variables (Required)
@@ -110,14 +109,13 @@ DRY_RUN=${INPUT_DRYRUN}
 
 ## Install Helm Plugins
 ##
-! [ "${INPUT_SCHEMADISABLE,,}" == "true" ] && helm plugin install https://github.com/karuppiah7890/helm-schema-gen > /dev/null 2>&1
-! [ "${INPUT_UNITTESTDISABLE,,}" == "true" ] && helm plugin install https://github.com/quintush/helm-unittest > /dev/null 2>&1
+! [ "${INPUT_SCHEMADISABLE,,}" != "true" ] && helm plugin install https://github.com/karuppiah7890/helm-schema-gen > /dev/null 2>&1
+! [ "${INPUT_UNITTESTDISABLE,,}" != "true" ] && helm plugin install https://github.com/quintush/helm-unittest > /dev/null 2>&1
 
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
 ##
 git fetch --tags
-HEAD_REV=$(git rev-parse --verify HEAD);
 LATEST_TAG_REV=$(git rev-parse --verify "$(latestTag)");
 
 ## Initialize for each directory a matching regex
@@ -305,7 +303,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           fi
 
           ## Unset Configuration Values
-          unset $(echo ${CONFIG_SUPPORTED_VALUES[*]})
+          unset $(echo "${CONFIG_SUPPORTED_VALUES[*]}")
       done
 
       ## Check Chart Errors
