@@ -150,6 +150,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
    ## Just to be sure, checking that the array
    ## is not empty
    ##
+   echo "${#EXISTING_CHARTS[@]}"
+
+
    if [[ ${#EXISTING_CHARTS[@]} -gt 0 ]]; then
 
       ## Create required directories
@@ -291,7 +294,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                log "Skipping Publish"
              else
                if helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
-                 log "Generate Package" "${GREEN}"
+                 log "Generated Package!" "${GREEN}"
                else
                  log "Generating Package failed!" "${RED}"
                  CHARTS_ERR+=("${CHART}");
@@ -312,9 +315,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       if [ ${#CHARTS_ERR[@]} -eq 0 ]; then
         log "No Chart contained errors"
       else
-        echo -e "\e[91mErrors found with charts (Check above output)\n----------------------------\e[0m"
+        echo -e "${RED}Errors found with charts (Check above output)\n----------------------------${NONE}"
         printf ' - %s  \n' "${CHARTS_ERR[@]}"
-        echo -e "\e[91m---------------------------\e[0m\n"
+        echo -e "${RED}---------------------------${NONE}\n"
         if [ -z "${INPUT_FORCE}" ]; then
           exit 1;
         else
