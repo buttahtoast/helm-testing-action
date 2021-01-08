@@ -150,7 +150,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
    ## Just to be sure, checking that the array
    ## is not empty
    ##
-   echo "${#EXISTING_CHARTS[@]}"
+   printf ' - %s  \n' "${#EXISTING_CHARTS[@]}"
 
 
    if [[ ${#EXISTING_CHARTS[@]} -gt 0 ]]; then
