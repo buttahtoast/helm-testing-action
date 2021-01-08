@@ -53,9 +53,13 @@ CONFIG_SUPPORTED_VALUES=( "DISABLE" "SKIP_PUBLISH" "SCHEMA_ENABLE" "SCHEMA_VALUE
 ## can create new releases and commits
 ## to the repository. The default configuration
 ## environment variable 'CR_TOKEN' is prefered over
-## the input setting.
+## the input setting. If nothing is set the GITHUB_TOKEN will
+## be used. If none of these is set, the script will fail
 ##
-export CR_TOKEN="${CR_TOKEN:-$INPUT_TOKEN}";
+if [ -z "${CR_TOKEN}" ]; then
+  export CR_TOKEN="${INPUT_TOKEN:-$GITHUB_TOKEN}";
+fi
+if [ -z "${CR_TOKEN}" ]; then echo -e "${RED}Github Token required for release action${NONE}" && exit 1; fi
 
 ## Chart Releaser default repository URL.
 ## This URL is used to fetch the current
@@ -288,19 +292,15 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             fi
 
             log "Creating Helm Package"
-            if [ -z "$DRY_RUN" ]; then
-             if [ "${SKIP_PUBLISH,,}" == "true" ]; then
-               log "Skipping Publish"
-             else
-               if helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
-                 log "Generated Package!" "${GREEN}"
-               else
-                 log "Generating Package failed!" "${RED}"
-                 CHARTS_ERR+=("${CHART}");
-               fi
-             fi
+            if [ "${SKIP_PUBLISH,,}" == "true" ]; then
+             log "Skipping Publish"
             else
-              log "Dry Run..."
+             if helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
+               log "Generated Package!" "${GREEN}"
+             else
+               log "Generating Package failed!" "${RED}"
+               CHARTS_ERR+=("${CHART}");
+             fi
             fi
           fi
 
@@ -330,7 +330,10 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## create a helm release on the GitHub Repository
       ##
       echo -e "\n${BLUE}- Creating Releases -${NONE}\n"
-      if [ -z "$DRY_RUN" ]; then
+      if [[ "${DRY_RUN,,}" == "true" ]]; then
+        log "Dry Run..."
+        exit 0;
+      else
         if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
           if ! cr upload $CR_ARGS; then echo -e "${RED}Something went wrong! Checks the logs above${NONE}"; exit 1; fi
 
@@ -356,9 +359,6 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
         else
           log "Nothing to release" && exit 0
         fi
-      else
-        log "Dry Run..."
-        exit 0;
       fi
     else
       ## Some Feedback
