@@ -59,7 +59,7 @@ CONFIG_SUPPORTED_VALUES=( "DISABLE" "SKIP_PUBLISH" "SCHEMA_ENABLE" "SCHEMA_VALUE
 if [ -z "${CR_TOKEN}" ]; then
   export CR_TOKEN="${INPUT_TOKEN:-$GITHUB_TOKEN}";
 fi
-if [ -z "${CR_TOKEN}" ]; then echo -e "${RED}Github Token required for release action ${NONE}" && exit 1; fi
+if [ -z "${CR_TOKEN}" ]; then echo -e "${RED}Github Token required for release action OUT: ${CR_TOKEN} ${NONE}" && exit 1; fi
 
 ## Chart Releaser default repository URL.
 ## This URL is used to fetch the current
