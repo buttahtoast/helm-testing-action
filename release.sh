@@ -38,6 +38,7 @@ YLW='\033[1;33m'
 BLUE='\033[1;34m'
 RED='\033[1;31m'
 GREEN='\033[1;32m'
+PRPLE='\033[1;0;35'
 
 
 ## Chart Configuration
@@ -169,7 +170,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       CHARTS_ERR=()
       echo -e "\n${BLUE}- Crafting Packages -${NONE}"
       for CHART in "${EXISTING_CHARTS[@]}"; do
-          echo -e "\n${YLW}-- Chart: $CHART --${NONE}\n"
+          echo -e "\n\n${PRPLE}-- Chart: $CHART --${NONE}"
 
           ## Local Chart Config Defaults
           CHART_KUBE_LINTER_CONFIG="${CHART%/}/${KUBE_LINTER_CONFIG:-.kube-linter.yaml}"
