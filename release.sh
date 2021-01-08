@@ -288,7 +288,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             fi
 
             log "Creating Helm Package"
-            if [ -z "$DRY_RUN" ]; then
+            if [[ "${DRY_RUN,,}" != "true" ]]; then
              if [ "${SKIP_PUBLISH,,}" == "true" ]; then
                log "Skipping Publish"
              else
@@ -330,7 +330,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## create a helm release on the GitHub Repository
       ##
       echo -e "\n${BLUE}- Creating Releases -${NONE}\n"
-      if [ -z "$DRY_RUN" ]; then
+      if [[ "${DRY_RUN,,}" == "true" ]]; then
         if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
           if ! cr upload $CR_ARGS; then echo -e "${RED}Something went wrong! Checks the logs above${NONE}"; exit 1; fi
 
