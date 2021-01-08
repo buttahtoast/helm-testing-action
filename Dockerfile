@@ -24,10 +24,6 @@ RUN apk add --no-cache ca-certificates curl bash git openssl jq && \
   curl -s -L -o /usr/local/bin/spruce https://github.com/geofffranks/spruce/releases/download/$(curl --silent "https://api.github.com/repos/geofffranks/spruce/releases/latest" | jq -r .tag_name)/spruce-linux-amd64 && \
   chmod +x /usr/local/bin/spruce
 
-## Install Helm Plugins
-##
-RUN helm plugin install https://github.com/karuppiah7890/helm-schema-gen
-
 ## Execute Action Handler
 ##
 CMD [ "bash", "/usr/local/src/release.sh" ]

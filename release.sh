@@ -35,8 +35,10 @@ log() {
 ## Different Colors Codes
 NONE='\033[0m'
 YLW='\033[1;33m'
+BLUE='\033[1;34m'
 RED='\033[1;31m'
 GREEN='\033[1;32m'
+PRPLE='\033[0;35m'
 
 
 ## Chart Configuration
@@ -109,8 +111,8 @@ DRY_RUN=${INPUT_DRYRUN}
 
 ## Install Helm Plugins
 ##
-! [ "${INPUT_SCHEMADISABLE,,}" != "true" ] && helm plugin install https://github.com/karuppiah7890/helm-schema-gen > /dev/null 2>&1
-! [ "${INPUT_UNITTESTDISABLE,,}" != "true" ] && helm plugin install https://github.com/quintush/helm-unittest > /dev/null 2>&1
+[ "${INPUT_SCHEMADISABLE,,}" != "true" ] && helm plugin install https://github.com/karuppiah7890/helm-schema-gen > /dev/null 2>&1
+[ "${INPUT_UNITTESTDISABLE,,}" != "true" ] && helm plugin install https://github.com/quintush/helm-unittest > /dev/null 2>&1
 
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
@@ -166,9 +168,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## with the helm built-in function.
       ##
       CHARTS_ERR=()
-      echo -e "\n${GREEN}- Crafting Packages${NONE}"
+      echo -e "\n${BLUE}- Crafting Packages -${NONE}"
       for CHART in "${EXISTING_CHARTS[@]}"; do
-          echo -e "\n${YLW}-- Chart: $CHART${NONE}\n"
+          echo -e "\n\n\e${PRPLE}-- Chart: $CHART --\e${NONE}"
 
           ## Local Chart Config Defaults
           CHART_KUBE_LINTER_CONFIG="${CHART%/}/${KUBE_LINTER_CONFIG:-.kube-linter.yaml}"
@@ -227,7 +229,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               fi
 
               log "Running Kube-Linter" "${YLW}"
-              if kube-linter lint ${EXTRA_ARGS} ${CHART}; then
+              if kube-linter lint --verbose ${EXTRA_ARGS} ${CHART}; then
                 log "Kube-Linter Succeded" "${GREEN}"
               else
                 if [[ -n "$KUBE_LINTER_ALLOW_FAIL" ]] || [[ -n "$INPUT_KUBELINTERALLOWFAILURE" ]]; then
@@ -260,9 +262,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               fi
             fi
 
+            ##
             ## Chart Schema Generator
-            ${INPUT_SCHEMADISABLE}
-
+            ##
             SCHEMA_PATH="${CHART%/}/values.schema.json"
             if [[ "${SCHEMA_ENABLE,,}" != "true" ]] || [[ "${INPUT_SCHEMADISABLE,,}" == "true" ]]; then
               log "Helm Schema Generator Disabled"
@@ -291,7 +293,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                log "Skipping Publish"
              else
                if helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
-                 log "Generate Package" "${GREEN}"
+                 log "Generated Package!" "${GREEN}"
                else
                  log "Generating Package failed!" "${RED}"
                  CHARTS_ERR+=("${CHART}");
@@ -308,17 +310,18 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
       ## Check Chart Errors
       ##
-      echo -e "\n\e[33m- Checking for Errors\e[0m\n"
+      echo -e "\n${BLUE}- Checking for Errors -${NONE}\n"
       if [ ${#CHARTS_ERR[@]} -eq 0 ]; then
-        echo -e "-- No Chart contained errors"
+        log "No Chart contained errors"
       else
-        echo -e "\e[91mErrors found with charts (Check above output)\n----------------------------\e[0m"
-        printf ' - %s  \n' "${CHARTS_ERR[@]}"
-        echo -e "\e[91m---------------------------\e[0m\n"
-        if [ -z "${INPUT_FORCE}" ]; then
-          exit 1;
+        echo -e "${RED}Errors found with charts (Check above output)${NONE}"
+        echo -e "${RED}----------------------------${NONE}"
+        printf ' * %s  \n' "${CHARTS_ERR[@]}"
+        echo -e "${RED}----------------------------${NONE}"
+        if [[ "${INPUT_FORCE,,}" != "true" ]]; then
+          log "Forcing Publish"
         else
-          echo -e "-- Forcing Publish";
+          exit 1;
         fi
       fi
 
@@ -326,10 +329,10 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## For each package made by helm cr will
       ## create a helm release on the GitHub Repository
       ##
-      echo -e "\n\e[33m- Creating Releases\e[0m\n"
+      echo -e "\n${BLUE}- Creating Releases -${NONE}\n"
       if [ -z "$DRY_RUN" ]; then
         if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
-          if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+          if ! cr upload $CR_ARGS; then echo -e "${RED}Something went wrong! Checks the logs above${NONE}"; exit 1; fi
 
           ## Setup git with the given Credentials
           ##
@@ -338,7 +341,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
           ## Recreate Index for the Pages index
           ##
-          if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+          if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "${RED}Something went wrong! Checks the logs above${NONE}"; exit 1; fi
 
           ## Checkout the pages branch and
           ## add Index as new addition and make a signed
@@ -351,17 +354,17 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           git commit -sm "Update index.yaml"
           git push origin gh-pages
         else
-          echo "Nothing to release" && exit 0
+          log "Nothing to release" && exit 0
         fi
       else
-        echo -e "Dry Run...";
+        log "Dry Run..."
         exit 0;
       fi
     else
       ## Some Feedback
-      echo -e "\n\e[33mChanges to non existent chart detected.\e[0m\n"; exit 0;
+      echo -e "${YLW}Changes to non existent chart detected.${NONE}"; exit 0;
     fi
 else
   ## Some Feedback
-  echo -e "\n\e[33mNo Changes on any chart detected.\e[0m\n"; exit 0;
+  echo -e "${YLW}No Changes on any chart detected.${NONE}"; exit 0;
 fi
