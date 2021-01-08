@@ -153,6 +153,8 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
    ##
    printf ' - %s  \n' "${#EXISTING_CHARTS[@]}"
 
+   printf ' - %s  \n' "${#PUBLISH_CHARTS[@]}"   
+
 
    if [[ ${#EXISTING_CHARTS[@]} -gt 0 ]]; then
 
@@ -170,7 +172,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## with the helm built-in function.
       ##
       CHARTS_ERR=()
-      echo -e "\n${BLUE}- Crafting Packages${NONE}"
+      echo -e "\n\n${BLUE}- Crafting Packages -${NONE}"
       for CHART in "${EXISTING_CHARTS[@]}"; do
           echo -e "\n${YLW}-- Chart: $CHART${NONE}\n"
 
@@ -312,7 +314,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
       ## Check Chart Errors
       ##
-      echo -e "\n${BLUE}- Checking for Errors${NONE}\n"
+      echo -e "\n\n${BLUE}- Checking for Errors -${NONE}\n"
       if [ ${#CHARTS_ERR[@]} -eq 0 ]; then
         log "No Chart contained errors"
       else
@@ -330,7 +332,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## For each package made by helm cr will
       ## create a helm release on the GitHub Repository
       ##
-      echo -e "\n${BLUE}- Creating Releases${NONE}\n"
+      echo -e "\n\n${BLUE}- Creating Releases -${NONE}\n"
       if [ -z "$DRY_RUN" ]; then
         if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
           if ! cr upload $CR_ARGS; then echo -e "${RED}Something went wrong! Checks the logs above${NONE}"; exit 1; fi
