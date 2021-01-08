@@ -327,6 +327,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ##
       echo -e "\n${BLUE}- Creating Releases -${NONE}\n"
       if [[ "${DRY_RUN,,}" == "true" ]]; then
+        log "Dry Run..."
+        exit 0;
+      else
         if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
           if ! cr upload $CR_ARGS; then echo -e "${RED}Something went wrong! Checks the logs above${NONE}"; exit 1; fi
 
@@ -352,9 +355,6 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
         else
           log "Nothing to release" && exit 0
         fi
-      else
-        log "Dry Run..."
-        exit 0;
       fi
     else
       ## Some Feedback
