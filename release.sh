@@ -313,9 +313,10 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       if [ ${#CHARTS_ERR[@]} -eq 0 ]; then
         log "No Chart contained errors"
       else
-        echo -e "${RED}Errors found with charts (Check above output)\n----------------------------${NONE}"
+        echo -e "${RED}Errors found with charts (Check above output)${NONE}"
+        echo -e "${RED}----------------------------${NONE}"
         printf ' * %s  \n' "${CHARTS_ERR[@]}"
-        echo -e "${RED}---------------------------${NONE}"
+        echo -e "${RED}----------------------------${NONE}"
         if [[ "${INPUT_FORCE,,}" != "true" ]]; then
           log "Forcing Publish"
         else
