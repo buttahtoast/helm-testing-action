@@ -170,7 +170,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       CHARTS_ERR=()
       echo -e "\n${BLUE}- Crafting Packages -${NONE}"
       for CHART in "${EXISTING_CHARTS[@]}"; do
-          echo -e "\n\n${PRPLE}-- Chart: $CHART --${NONE}"
+          echo -e "\n\n\e${PRPLE}-- Chart: $CHART --\e${NONE}"
 
           ## Local Chart Config Defaults
           CHART_KUBE_LINTER_CONFIG="${CHART%/}/${KUBE_LINTER_CONFIG:-.kube-linter.yaml}"
