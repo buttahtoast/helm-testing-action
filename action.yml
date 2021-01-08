@@ -19,6 +19,13 @@ inputs:
     required: false
     default: './cr.yaml'
 
+  ## Chart Configuration filename
+  ##
+  chartConfig:
+    description: 'Chart Configuration file'
+    required: false
+
+
   ## Configuration for the git username (Release owner)
   ##
   user:
