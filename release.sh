@@ -109,8 +109,8 @@ DRY_RUN=${INPUT_DRYRUN}
 
 ## Install Helm Plugins
 ##
-! [ "${INPUT_SCHEMADISABLE,,}" != "true" ] && helm plugin install https://github.com/karuppiah7890/helm-schema-gen > /dev/null 2>&1
-! [ "${INPUT_UNITTESTDISABLE,,}" != "true" ] && helm plugin install https://github.com/quintush/helm-unittest > /dev/null 2>&1
+[ "${INPUT_SCHEMADISABLE,,}" != "true" ] && helm plugin install https://github.com/karuppiah7890/helm-schema-gen > /dev/null 2>&1
+[ "${INPUT_UNITTESTDISABLE,,}" != "true" ] && helm plugin install https://github.com/quintush/helm-unittest > /dev/null 2>&1
 
 ## Git Tag Fetching
 ## For a comparison we just need the latest tag.
@@ -260,9 +260,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
               fi
             fi
 
+            ##
             ## Chart Schema Generator
-            ${INPUT_SCHEMADISABLE}
-
+            ##
             SCHEMA_PATH="${CHART%/}/values.schema.json"
             if [[ "${SCHEMA_ENABLE,,}" != "true" ]] || [[ "${INPUT_SCHEMADISABLE,,}" == "true" ]]; then
               log "Helm Schema Generator Disabled"
@@ -308,9 +308,9 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
       ## Check Chart Errors
       ##
-      echo -e "\n\e[33m- Checking for Errors\e[0m\n"
+      echo -e "\n${YLW}- Checking for Errors${NONE}\n"
       if [ ${#CHARTS_ERR[@]} -eq 0 ]; then
-        echo -e "-- No Chart contained errors"
+        log "No Chart contained errors"
       else
         echo -e "\e[91mErrors found with charts (Check above output)\n----------------------------\e[0m"
         printf ' - %s  \n' "${CHARTS_ERR[@]}"
@@ -318,7 +318,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
         if [ -z "${INPUT_FORCE}" ]; then
           exit 1;
         else
-          echo -e "-- Forcing Publish";
+          log "Forcing Publish"
         fi
       fi
 
@@ -326,10 +326,10 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
       ## For each package made by helm cr will
       ## create a helm release on the GitHub Repository
       ##
-      echo -e "\n\e[33m- Creating Releases\e[0m\n"
+      echo -e "\n${YLW}- Creating Releases${NONE}\n"
       if [ -z "$DRY_RUN" ]; then
         if [ "$(ls -A ${CR_RELEASE_LOCATION})" ]; then
-          if ! cr upload $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+          if ! cr upload $CR_ARGS; then echo -e "${RED}Something went wrong! Checks the logs above${NONE}"; exit 1; fi
 
           ## Setup git with the given Credentials
           ##
@@ -338,7 +338,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
 
           ## Recreate Index for the Pages index
           ##
-          if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "\n\e[91mSomething went wrong! Checks the logs above\e[0m\n"; exit 1; fi
+          if ! cr index -c "$CR_REPO_URL" $CR_ARGS; then echo -e "${RED}Something went wrong! Checks the logs above${NONE}"; exit 1; fi
 
           ## Checkout the pages branch and
           ## add Index as new addition and make a signed
@@ -351,17 +351,17 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           git commit -sm "Update index.yaml"
           git push origin gh-pages
         else
-          echo "Nothing to release" && exit 0
+          log "Nothing to release" && exit 0
         fi
       else
-        echo -e "Dry Run...";
+        log "Dry Run..."
         exit 0;
       fi
     else
       ## Some Feedback
-      echo -e "\n\e[33mChanges to non existent chart detected.\e[0m\n"; exit 0;
+      echo -e "${YLW}Changes to non existent chart detected.${NONE}"; exit 0;
     fi
 else
   ## Some Feedback
-  echo -e "\n\e[33mNo Changes on any chart detected.\e[0m\n"; exit 0;
+  echo -e "${YLW}No Changes on any chart detected.${NONE}"; exit 0;
 fi
