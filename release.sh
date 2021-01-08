@@ -288,19 +288,15 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
             fi
 
             log "Creating Helm Package"
-            if [[ "${DRY_RUN,,}" != "true" ]]; then
-             if [ "${SKIP_PUBLISH,,}" == "true" ]; then
-               log "Skipping Publish"
-             else
-               if helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
-                 log "Generated Package!" "${GREEN}"
-               else
-                 log "Generating Package failed!" "${RED}"
-                 CHARTS_ERR+=("${CHART}");
-               fi
-             fi
+            if [ "${SKIP_PUBLISH,,}" == "true" ]; then
+             log "Skipping Publish"
             else
-              log "Dry Run..."
+             if helm package $CHART --dependency-update --destination ${CR_RELEASE_LOCATION}; then
+               log "Generated Package!" "${GREEN}"
+             else
+               log "Generating Package failed!" "${RED}"
+               CHARTS_ERR+=("${CHART}");
+             fi
             fi
           fi
 
