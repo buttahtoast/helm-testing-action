@@ -118,36 +118,6 @@ checks:
 
 All [spruce operators](https://github.com/geofffranks/spruce/blob/master/doc/operators.md) are supported.
 
-## Chart Configuration
-
-Certain configurations are required on chart basis. With the following variables there's the possibility to change a single charts behavior. By default you can place these variables in a file called `.chart-config` in a chart directory.
-
-| Variable | Description | Values |
-| :------- | :---------- | :----- |
-| `DISABLE` | Disables the chart during the release process. | `true`/`false` |
-| `SCHEMA_GENERATE` | Generates Schema with [helm-schema-gen](https://github.com/karuppiah7890/helm-schema-gen) if no values.schema.json file exists. | `true`/`false` |
-| `SCHEMA_VALUES` | Define the location of the values file within the chart directory, which is used to generate the values schema. | `values.yaml` |
-| `SCHEMA_FORCE` | If there is already a `values.schema.json` file present in the chart directory, no schema will be generated. This option forces to generate the schema and overwrite present schema files. | `true`/`false` |
-
-### Examples
-
-Disable a chart (Won't create a new release)
-
-**charts/sample-chart/.chart-config**
-
-```
-DISABLE=true
-```
-
-Enable enforced Schema Generation
-
-**charts/sample-chart-2/.chart-config**
-
-```
-SCHEMA_GENERATE=true
-SCHEMA_FORCE=true
-```
-
 ## Usage
 
 Using this action with it's default values is very easy. Just pass the Built-In `$GITHUB_TOKEN` environment  variable and you are good to go:
