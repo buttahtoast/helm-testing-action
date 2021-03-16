@@ -221,8 +221,8 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
                   log "Merge with Global Kube-Linter configuration"
                   spruce merge ${INPUT_KUBELINTERDEFAULTCONFIG} ${CHART_KUBE_LINTER_CONFIG} > "${CHART%/}/merged-kube-linter"
                   if [ -f "${CHART%/}/merged-kube-linter" ]; then
-                    log "Using Merged Kube-Linter Config (${CHART%/})/merged-kube-linter"
                     EXTRA_ARGS="--config ${CHART%/}/merged-kube-linter"
+                    log "Using Merged Kube-Linter Config (${CHART%/})/merged-kube-linter"
                   else
                     breakChart "${CHART}" && break;
                   fi
