@@ -84,7 +84,7 @@ Before you start, check out how to create Kube-Linter configurations [here](http
 ---
 checks:
   addAllBuiltIn: true
-  execlude:
+  exclude:
     - "default-service-account"
     - "no-anti-affinity"
     - "required-annotation-email"
@@ -95,7 +95,7 @@ checks:
 ```
 ---
 checks:
-  execlude:
+  exclude:
     - (( prepend ))
     - "required-label-owner"
     - "unset-cpu-requirements"
@@ -107,7 +107,7 @@ Results in:
 ```
 checks:
   addAllBuiltIn: true
-  execlude:
+  exclude:
   - required-label-owner
   - unset-cpu-requirements
   - unset-memory-requirements
