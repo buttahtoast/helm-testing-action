@@ -307,7 +307,7 @@ if [[ ${#PUBLISH_CHARTS[@]} -gt 0 ]]; then
           fi
 
           ## Unset Configuration Values
-          unset $(echo "${CONFIG_SUPPORTED_VALUES[*]}")
+          unset "$(echo ${CONFIG_SUPPORTED_VALUES[*]})"
       done
 
       ## Check Chart Errors
