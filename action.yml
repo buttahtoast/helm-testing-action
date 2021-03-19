@@ -5,117 +5,16 @@ branding:
   icon: 'archive'
   color: 'purple'
 inputs:
-
-  ## Configuration for the personal acces token being used
-  ##
-  token:
-    description: 'A personal access token needed to push your site after it has been built.'
+  exec:
+    description: 'Declare which script to execute'
     required: false
-
-  ## Configuration fo a Chart Releaser COnfiguration
-  ##
-  config:
-    description: 'Chart Releaser configuration file'
+  charts:
+    description: 'Declare changed charts'
     required: false
-    default: './cr.yaml'
-
-  ## Configuration for the git username (Release owner)
-  ##
-  user:
-    description: 'Define the user name used for commits (pages update)'
-    required: false
-
-  ## Configuration for the git email
-  ##
-  email:
-    description: 'Define the user email used for commits (pages update)'
-    required: false
-
-  ## Configuration for git-repo name
-  ## Reference: https://github.com/helm/chart-releaser#environment-variables
-  ##
-  repository:
-    description: 'Define the repository url, where the index is exposed. By default we assume you are using {org/user}.github.io/{repo-name}/'
-    required: false
-
-  ## Configuration for charts directories
-  ##
-  chartRoot:
-    description: 'Charts root directory'
-    default: 'charts/'
-    required: false
-
-  ## Chart Configuration filename
-  ##
   chartConfig:
-    description: 'Chart Configuration file'
-    default: ".chart-config"
-    required: false
-
-  ## Configuration for Dry Run
-  ##
-  dryrun:
-    description: 'Run Publishing Action without publishing charts'
-    default: "false"
-    required: false
-
-  ## Configuration for Force
-  ##
-  force:
-    description: 'Force publishing even if charts had errors (publish charts without error)'
-    default: "false"
-    required: false
-
-  ## Configuration Schema Generator
-  ## Disable Global Schema Generator Usage
-  schemaDisable:
-    required: false
-    description: 'Disable Global Schema Generator Usage'
-    default: "false"
-
-  ## Configuration Schema Generator
-  ## Allows Schema Generator Jobs to fail (Global)
-  schemaAllowFailure:
-    required: false
-    description: 'Allows Schema Generator Jobs to fail (Global)'
-    default: "false"
-
-  ## Configuration Kube Linter
-  ## Disable Global Kube-Linter Usage
-  kubeLinterDisable:
-    required: false
-    description: 'Disable Global Kube-Linter Usage'
-    default: "false"
-
-  ## Configuration Kube Linter
-  ## Define a default Configuration used for all charts, if none defined.
-  kubeLinterDefaultConfig:
-    required: false
-    description: 'Default Global Kube-Linter Configuration'
-    default: './.kube-linter.yaml'
-
-  ## Configuration Kube Linter
-  ## Allows Kube Linter Jobs to fail (Global)
-  kubeLinterAllowFailure:
-    required: false
-    description: 'Allows Kube Linter Jobs to fail (Global)'
-    default: "false"
-
-
-  ## Configuration Helm Unit Test
-  ## Disable Global Helm Unit Testing Usage
-  unitTestDisable:
-    required: false
-    description: 'Disable Global Helm Unit Testing Usage'
-    default: "false"
-
-  ## Configuration Helm Unit Test
-  ## Allows Helm Unit Test Jobs to fail (Global)
-  unitTestAllowFailure:
-    required: false
-    description: 'Allows Helm Unit Test Jobs to fail (Global)'
-    default: "false"
-
+    description: "Define filename for chart configuration file"
+    required: false 
+    default: ".chart-config"  
 
 runs:
   using: docker
