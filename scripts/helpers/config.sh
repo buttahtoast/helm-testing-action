@@ -10,7 +10,6 @@ function config_unset {
   done
 }
 
-
 function config_load { 
   C_CONFIG="${1%/}/${CONFIG_NAME}" 
   echo -e "[${1}]: ${Yellow}Attempt to load config ($C_CONFIG)${Off}"   
